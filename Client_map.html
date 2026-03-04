@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROIs Crew — Airline Client Map</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --bg: #060d1f;
+  --ocean: #0b1a35;
+  --land: #0f2545;
+  --land-hover: #1a3a6b;
+  --border: #1e3d6e;
+  --accent: #38bdf8;
+  --text: #e2e8f0;
+  --muted: #64748b;
+}
+
+body {
+  background: var(--bg);
+  font-family: 'DM Mono', monospace;
+  color: var(--text);
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#map-wrap {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+svg {
+  width: 100%;
+  height: 100%;
+}
+
+.graticule { fill: none; stroke: rgba(56,189,248,0.06); stroke-width: 0.5; }
+.sphere { fill: var(--ocean); }
+.country { fill: var(--land); stroke: var(--border); stroke-width: 0.5; transition: fill 0.2s; }
+.country.highlighted { fill: #1e4080; }
+
+/* Marker styles */
+.marker-group { cursor: pointer; }
+
+.marker-bg {
+  fill: white;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.7));
+  transition: transform 0.2s;
+}
+
+.marker-ring {
+  fill: none;
+  stroke-width: 1.5;
+  opacity: 0.8;
+}
+
+.marker-group:hover .marker-bg {
+  filter: drop-shadow(0 4px 20px rgba(56,189,248,0.7));
+}
+
+/* Ping ring — animation driven per-marker in JS (Web Animations API) */
+.ping { transform-origin: center center; transform-box: fill-box; }
+
+/* Header */
+#header {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  padding: 18px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(180deg, rgba(6,13,31,0.97) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.title h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--text);
+}
+.title h1 em { color: var(--accent); font-style: normal; }
+.title p {
+  font-size: 0.6rem;
+  color: var(--muted);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.kpis { display: flex; gap: 28px; }
+.kpi { text-align: center; }
+.kpi-n { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--accent); }
+.kpi-l { font-size: 0.55rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+
+/* Tooltip */
+#tip {
+  position: fixed;
+  background: rgba(11,26,53,0.97);
+  border: 1px solid rgba(56,189,248,0.5);
+  border-radius: 10px;
+  padding: 12px 16px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 100;
+  min-width: 180px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(56,189,248,0.1);
+}
+#tip.show { opacity: 1; }
+#tip-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; margin-bottom: 2px; }
+#tip-loc  { font-size: 0.6rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+#tip-img  { max-width: 150px; max-height: 52px; object-fit: contain; background: #fff; padding: 6px 10px; border-radius: 6px; display: block; }
+
+/* Legend */
+#legend {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(11,26,53,0.92);
+  border: 1px solid rgba(56,189,248,0.15);
+  border-radius: 10px;
+  padding: 14px 18px;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+}
+#legend h3 { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); margin-bottom: 10px; }
+.leg { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 0.68rem; }
+.leg-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.leg-cnt { color: var(--muted); font-size: 0.58rem; margin-left: 2px; }
+
+/* Zoom controls */
+#zoom-btns {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 10;
+}
+.zbtn {
+  width: 36px; height: 36px;
+  background: rgba(11,26,53,0.92);
+  border: 1px solid rgba(56,189,248,0.2);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s, border-color 0.2s;
+  backdrop-filter: blur(8px);
+}
+.zbtn:hover { background: rgba(30,64,128,0.9); border-color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div id="map-wrap">
+  <svg id="map"></svg>
+</div>
+
+<div id="tip">
+  <div id="tip-name"></div>
+  <div id="tip-loc"></div>
+  <img id="tip-img" src="" alt=""/>
+</div>
+
+<div id="header">
+  <div class="title">
+    <h1>ROIs <em>Crew</em></h1>
+    <p>Asia Pacific Airline Client Network · 2026</p>
+  </div>
+  <div class="kpis">
+    <div class="kpi"><div class="kpi-n">17</div><div class="kpi-l">Airlines</div></div>
+    <div class="kpi"><div class="kpi-n">8</div><div class="kpi-l">Countries</div></div>
+    <div class="kpi"><div class="kpi-n">APAC+</div><div class="kpi-l">Region</div></div>
+  </div>
+</div>
+
+<div id="legend">
+  <h3>Countries</h3>
+  <div id="leg-items"></div>
+</div>
+
+<div id="zoom-btns">
+  <button class="zbtn" id="zin">+</button>
+  <button class="zbtn" id="zout">−</button>
+  <button class="zbtn" id="zreset" style="font-size:0.7rem">⌂</button>
+</div>
+
+<script>
+const AIRLINES =[{"name":"Air China","country":"China","lat":39.9,"lng":116.4,"img":"image14","city":"Beijing","src":"images/Air_China.png"},{"name":"Air China Cargo","country":"China","lat":39.9,"lng":116.4,"img":"image3","city":"Beijing","src":"images/Air_China_Cargo.png"},{"name":"Loong Air","country":"China","lat":30.3,"lng":120.2,"img":"image4","city":"Hangzhou","src":"images/Loong_Air.png"},{"name":"JDL Airlines","country":"China","lat":28.2,"lng":112.9,"img":"image6","city":"Changsha","src":"images/JDL_Airlines.png"},{"name":"Shenzhen Airlines","country":"China","lat":22.5,"lng":114.1,"img":"image7","city":"Shenzhen","src":"images/Shenzhen_Airlines.png"},{"name":"OK Air","country":"China","lat":41.8,"lng":123.4,"img":"image8","city":"Shenyang","src":"images/OK_Air.png"},{"name":"Hong Kong Airlines","country":"Hong Kong","lat":22.3,"lng":114.2,"img":"image10","city":"Hong Kong","src":"images/Hong_Kong_Airlines.png"},{"name":"Eva Air","country":"Taiwan","lat":25.1,"lng":121.6,"img":"image12","city":"Taipei","src":"images/Eva_Air.png"},{"name":"Tigerair Taiwan","country":"Taiwan","lat":25.05,"lng":121.5,"img":"image11","city":"Taipei","src":"images/Tigerair_Taiwan.png"},{"name":"Uni Air","country":"Taiwan","lat":24.8,"lng":120.9,"img":"image9","city":"Hsinchu","src":"images/Uni_Air.png"},{"name":"Thai Airways","country":"Thailand","lat":13.8,"lng":100.5,"img":"image13","city":"Bangkok","src":"images/Thai_Airways.png"},{"name":"Singapore Airlines","country":"Singapore","lat":1.35,"lng":103.82,"img":"image15","city":"Singapore","src":"images/Singapore_Airlines.png"},{"name":"Philippine Airlines","country":"Philippines","lat":14.6,"lng":121.0,"img":"image16","city":"Manila","src":"images/Philippine_Airlines.png"},{"name":"Cebu Pacific","country":"Philippines","lat":14.5,"lng":121.1,"img":"image17","city":"Manila","src":"images/Cebu_Pacific.png"},{"name":"Alliance Airlines","country":"Canada","lat":-27.5,"lng":153.0,"img":"image5","city":"Brisbane","src":"images/Alliance_Airlines.png"},{"name":"Flair Airlines","country":"Thailand","lat":53.5,"lng":-113.5,"img":"image18","city":"Edmonton","src":"images/Flair_Airlines.png"},{"name":"Lufthansa","country":"Germany","lat":50.1,"lng":8.7,"img":"image19","city":"Frankfurt","src":"images/Lufthansa.svg"}];
+
+const COLORS = {
+  'China':       '#f87171',
+  'Hong Kong':   '#fb923c',
+  'Taiwan':      '#facc15',
+  'Thailand':    '#a78bfa',
+  'Singapore':   '#38bdf8',
+  'Philippines': '#4ade80',
+  'Australia':   '#f97316',
+  'Canada':      '#f43f5e',
+  'Germany':     '#fbbf24'
+};
+
+const W = window.innerWidth, H = window.innerHeight;
+const svg = d3.select('#map');
+
+// Zoom behavior
+const zoom = d3.zoom()
+  .scaleExtent([0.8, 12])
+  .on('zoom', ({transform}) => {
+    g.attr('transform', transform);
+    g.selectAll('.marker-group').attr('transform', function() {
+      const orig = d3.select(this).attr('data-xy');
+      if (!orig) return d3.select(this).attr('transform');
+      const [x, y] = orig.split(',').map(Number);
+      return `translate(${x},${y}) scale(${1/transform.k})`;
+    });
+  });
+
+svg.call(zoom);
+
+const g = svg.append('g');
+
+// Projection — Natural Earth, rotated so Asia-Pacific is centered on screen
+const projection = d3.geoNaturalEarth1()
+  .scale(W / 4.08)
+  .rotate([-155, -10])  // tilted up 15°
+  .translate([W / 2, H / 2 + H * 0.12]);  // shifted down — Europe up, Australia cropped
+
+const path = d3.geoPath().projection(projection);
+
+// Sphere (ocean)
+g.append('path')
+  .datum({type:'Sphere'})
+  .attr('class','sphere')
+  .attr('d', path);
+
+// Graticule
+g.append('path')
+  .datum(d3.geoGraticule()())
+  .attr('class','graticule')
+  .attr('d', path);
+
+// Load world TopoJSON
+fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+  .then(r => r.json())
+  .then(world => {
+    const countries = topojson.feature(world, world.objects.countries);
+    
+    // Highlight countries that have airlines
+    const airlineCountries = new Set();
+    
+    g.selectAll('.country')
+      .data(countries.features)
+      .join('path')
+      .attr('class', 'country')
+      .attr('d', path);
+
+    // Draw markers after map
+    drawMarkers();
+  })
+  .catch(() => {
+    // Fallback: just draw markers without map
+    drawMarkers();
+  });
+
+function latLngToXY(lat, lng) {
+  return projection([lng, lat]);
+}
+
+// Spread logic for overlapping markers
+const offsets = {
+  'Eva Air':           [20, -15],
+  'Tigerair Taiwan':   [20, 10],
+  'Uni Air':           [-22, 12],
+  'Philippine Airlines': [-22, -10],
+  'Cebu Pacific':      [20, 10],
+  'Hong Kong Airlines':[-22, -12],
+  'Shenzhen Airlines': [-22, 12],
+  'Loong Air':         [22, -15],
+  'Air China':         [-24, -12],
+  'Air China Cargo':   [24, 12],
+};
+
+const R = 20; // logo circle radius
+const BIG_LOGOS = new Set(['Singapore Airlines', 'Thai Airways', 'Alliance Airlines', 'Flair Airlines', 'Lufthansa']);
+const LOGO_SCALE = {'Singapore Airlines': 1.2, 'Thai Airways': 1.2, 'Alliance Airlines': 1.2, 'Flair Airlines': 1.2, 'Lufthansa': 1.2};
+
+function drawMarkers() {
+  const markerG = g.append('g').attr('class', 'markers');
+
+  const tip = document.getElementById('tip');
+
+  // Destination projected pixel positions
+  const destCanada   = projection([-96, 56]);   // geographic centre of Canada
+  const destThailand = projection([101, 15]);   // centre of Thailand
+
+  AIRLINES.forEach((airline, i) => {
+    const xy = latLngToXY(airline.lat, airline.lng);
+    if (!xy) return;
+    const off = offsets[airline.name] || [0, 0];
+    const [x, y] = [xy[0] + off[0], xy[1] + off[1]];
+    const color = COLORS[airline.country] || '#fff';
+    const r = R * (LOGO_SCALE[airline.name] || 1.0);
+
+    const mg = markerG.append('g')
+      .attr('class', 'marker-group')
+      .attr('data-xy', `${x},${y}`)
+      .attr('transform', `translate(${x},${y})`);
+
+    // Pulse ring — travels to its destination using exact projection offset
+    const dest = airline.name === 'Flair Airlines' ? destThailand : destCanada;
+    const dx = dest[0] - x;
+    const dy = dest[1] - y;
+
+    const pingEl = mg.append('circle')
+      .attr('class', 'ping')
+      .attr('r', r)
+      .attr('fill', 'none')
+      .attr('stroke', color)
+      .attr('stroke-width', 1.5)
+      .node();
+
+    pingEl.animate([
+      { transform: 'translate(0px, 0px)', opacity: 0.85, offset: 0 },
+      { opacity: 0.5,                                     offset: 0.55 },
+      { transform: `translate(${dx}px, ${dy}px)`, opacity: 0, offset: 1 }
+    ], {
+      duration: 14000,
+      easing: 'cubic-bezier(0, 0, 0.2, 1)',
+      iterations: Infinity,
+      delay: 0
+    });
+
+    // White circle bg for logo
+    mg.append('circle')
+      .attr('class', 'marker-bg')
+      .attr('r', r)
+      .attr('fill', 'white')
+      .attr('stroke', color)
+      .attr('stroke-width', 2);
+
+    // Clip path for logo
+    const clipId = `clip-${i}`;
+    mg.append('clipPath')
+      .attr('id', clipId)
+      .append('circle')
+      .attr('r', r - 2);
+
+    // Logo image
+    mg.append('image')
+      .attr('href', `${airline.src}`)
+      .attr('x', -(r-2))
+      .attr('y', -(r-2))
+      .attr('width', (r-2)*2)
+      .attr('height', (r-2)*2)
+      .attr('preserveAspectRatio', 'xMidYMid meet')
+      .attr('clip-path', `url(#${clipId})`);
+
+    // Hover events
+    mg.on('mouseenter', function(event) {
+      document.getElementById('tip-name').textContent = airline.name;
+      document.getElementById('tip-loc').textContent = `${airline.city} · ${airline.country}`;
+      document.getElementById('tip-img').src = `${airline.src}`;
+      
+      const bx = event.clientX, by = event.clientY;
+      const tx = bx + 20 + 200 > window.innerWidth ? bx - 220 : bx + 20;
+      const ty = by - 40;
+      tip.style.left = tx + 'px';
+      tip.style.top = ty + 'px';
+      tip.classList.add('show');
+
+      d3.select(this).select('.marker-bg')
+        .transition().duration(150)
+        .attr('r', r * 1.25);
+    })
+    .on('mousemove', function(event) {
+      const tx = event.clientX + 20 + 200 > window.innerWidth ? event.clientX - 220 : event.clientX + 20;
+      tip.style.left = tx + 'px';
+      tip.style.top = (event.clientY - 40) + 'px';
+    })
+    .on('mouseleave', function() {
+      tip.classList.remove('show');
+      d3.select(this).select('.marker-bg')
+        .transition().duration(150)
+        .attr('r', r);
+    });
+  });
+}
+
+// Legend
+const byCountry = {};
+AIRLINES.forEach(a => { (byCountry[a.country] = byCountry[a.country] || []).push(a); });
+const legEl = document.getElementById('leg-items');
+Object.entries(byCountry).forEach(([c, arr]) => {
+  const d = document.createElement('div');
+  d.className = 'leg';
+  d.innerHTML = `<div class="leg-dot" style="background:${COLORS[c]||'#fff'}"></div><span>${c}</span><span class="leg-cnt">(${arr.length})</span>`;
+  legEl.appendChild(d);
+});
+
+// Zoom buttons
+document.getElementById('zin').onclick    = () => svg.transition().call(zoom.scaleBy, 1.5);
+document.getElementById('zout').onclick   = () => svg.transition().call(zoom.scaleBy, 0.67);
+document.getElementById('zreset').onclick = () => svg.transition().call(zoom.transform, d3.zoomIdentity);
+</script>
+</body>
+</html>
