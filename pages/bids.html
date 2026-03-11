@@ -1,0 +1,158 @@
+    <div class="page-header">
+      <div class="page-title-area">
+        <div class="page-eyebrow">Roster Analytics Engine</div>
+        <div class="page-title">Bids Type Analysis</div>
+        <div class="page-subtitle">Upload one or more crew bids text files (.txt) to generate a structured Word report</div>
+      </div>
+    </div>
+
+    <div class="bids-grid">
+
+      <!-- LEFT: Upload + Log -->
+      <div style="display:flex;flex-direction:column;gap:20px;">
+
+        <!-- Upload Panel -->
+        <div class="upload-panel">
+          <div class="panel-header">
+            <div class="panel-header-icon">📂</div>
+            <div class="panel-title">Upload Bids Files</div>
+            <div class="panel-count" id="bids-file-count">0 FILES QUEUED</div>
+          </div>
+
+          <div class="bids-upload-zone" id="bids-upload-zone">
+            <input type="file" id="bids-file-input" accept=".txt,.rtf" multiple>
+            <span class="upload-icon">📋</span>
+            <div class="upload-title">Drop Crew Bids Text Files Here</div>
+            <div class="upload-subtitle">
+              N-PBS bid export (.txt) · Single or multi-file comparison<br>
+              First file = Baseline · Additional files = Comparison periods
+            </div>
+            <div class="upload-formats">
+              <span class="format-tag">TXT</span>
+              <span class="format-tag">RTF</span>
+              <span class="format-tag">N-PBS Export</span>
+              <span class="format-tag">Multi-File</span>
+              <span class="format-tag">DOCX Output</span>
+            </div>
+          </div>
+
+          <div class="file-list" id="bids-file-list">
+            <div class="empty-state visible" id="bids-empty-state">
+              NO FILES QUEUED · DROP BID FILES TO BEGIN
+            </div>
+          </div>
+
+          <div id="bids-role-note" class="bids-role-note" style="display:none;">
+            First file = <strong>BASELINE</strong> · Additional files compared against it
+          </div>
+
+          <div class="progress-bar-wrap" id="bids-progress-wrap" style="display:none;">
+            <div class="progress-bar-fill" id="bids-progress-bar"></div>
+          </div>
+
+          <button class="convert-btn" id="bids-generate-btn" onclick="generateBidsReport()" disabled>
+            <span class="spinner" id="bids-spinner" style="display:none;"></span>
+            <span id="bids-btn-text">◑  GENERATE WORD REPORT</span>
+          </button>
+        </div>
+
+        <!-- Processing Log -->
+        <div class="log-panel">
+          <div class="panel-header">
+            <div class="panel-header-icon" style="font-size:10px;">▶</div>
+            <div class="panel-title">Analysis Log</div>
+            <div class="panel-count" id="bids-log-count">0 ENTRIES</div>
+          </div>
+          <div class="log-body" id="bids-log-body">
+            <div class="log-entry">
+              <span class="log-time" id="bids-init-time"></span>
+              <span class="log-msg info">System ready · Awaiting bids file input</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: Options + Result + Reference -->
+      <div class="config-panel">
+
+        <!-- Report Options -->
+        <div class="config-card">
+          <div class="config-card-header">⚙ Report Options</div>
+          <div class="config-body">
+            <div class="config-row">
+              <span class="config-label">Engine version</span>
+              <span class="config-value">V2.0</span>
+            </div>
+            <div class="config-row">
+              <span class="config-label">Bid types tracked</span>
+              <span class="config-value">79</span>
+            </div>
+            <div class="config-row">
+              <span class="config-label">Overview table</span>
+              <div class="toggle on"></div>
+            </div>
+            <div class="config-row">
+              <span class="config-label">Bid type breakdown</span>
+              <div class="toggle on"></div>
+            </div>
+            <div class="config-row">
+              <span class="config-label">Top 10 summary</span>
+              <div class="toggle on"></div>
+            </div>
+            <div class="config-row">
+              <span class="config-label">Output format</span>
+              <span class="config-value">DOCX</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Result card (hidden until report generated) -->
+        <div class="result-card" id="bids-result-card" style="display:none;">
+          <div class="result-header">
+            <div class="result-check">✓</div>
+            <div class="result-title">Report Generated</div>
+          </div>
+          <div class="result-body">
+            <div class="result-stats">
+              <div class="result-stat">
+                <div class="result-stat-val" id="bids-res-files">—</div>
+                <div class="result-stat-lbl">Files</div>
+              </div>
+              <div class="result-stat">
+                <div class="result-stat-val" id="bids-res-crews">—</div>
+                <div class="result-stat-lbl">Crew</div>
+              </div>
+              <div class="result-stat">
+                <div class="result-stat-val" id="bids-res-entries">—</div>
+                <div class="result-stat-lbl">Preferences</div>
+              </div>
+              <div class="result-stat">
+                <div class="result-stat-val" id="bids-res-types">—</div>
+                <div class="result-stat-lbl">Bid Types Used</div>
+              </div>
+            </div>
+            <button class="download-btn" id="bids-download-btn">
+              ⬇ &nbsp; DOWNLOAD WORD REPORT
+            </button>
+          </div>
+        </div>
+
+        <!-- Bid Type Reference — populated by JS after analysis -->
+        <div class="config-card">
+          <div class="config-card-header">
+            ◎ Bid Type Reference
+            <span style="font-size:10px;color:var(--text-muted);font-weight:400;margin-left:6px;">Top 20 by crew count</span>
+          </div>
+          <div class="config-body" style="padding:12px 20px;">
+            <div id="bids-type-ref-body"></div>
+            <div class="config-row" id="bids-type-legend-placeholder">
+              <span class="config-label" style="color:var(--text-muted);font-style:italic;font-size:11px;">
+                Run analysis to see bid type breakdown.
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>

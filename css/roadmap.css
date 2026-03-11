@@ -1,0 +1,138 @@
+/* ===== ABOUT ROADMAP PAGE ===== */
+#page-roadmap {
+  height: calc(100vh - 64px);
+  padding: 0; overflow: hidden;
+  box-sizing: border-box;
+}
+
+#rdm-wrap {
+  width: 100%; height: 100%;
+  background: #f0f3f7;
+  font-family: 'Barlow', sans-serif;
+}
+
+/* ── Road canvas fills the whole page ── */
+#rdm-wrap .rdm-road-wrap {
+  position: relative;
+  width: 100%; height: 100%;
+  overflow: hidden;
+}
+
+#rdm-wrap .rdm-road-svg {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+
+/* ── Milestone: absolutely positioned, anchored at pin bottom ── */
+#rdm-wrap .milestone {
+  position: absolute;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center;
+}
+
+/* ── Content card ── */
+#rdm-wrap .rdm-card {
+  background: #fff;
+  border-radius: 16px; padding: 0; width: 200px;
+  box-shadow: 0 8px 28px rgba(10,30,61,0.13), 0 1px 6px rgba(10,30,61,0.07);
+  border-top: 4px solid #8b6040;
+  animation: rdm-fadeUp 5.5s ease both;
+  overflow: hidden;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+#rdm-wrap .rdm-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 44px rgba(10,30,61,0.18);
+}
+
+@keyframes rdm-fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Card header: year + half ── */
+#rdm-wrap .rdm-card-head {
+  padding: 16px 18px 10px;
+}
+#rdm-wrap .rdm-card-year {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 38px; font-weight: 700;
+  color: #0a1e3d; line-height: 1;
+}
+#rdm-wrap .rdm-card-half {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: #00b4a0; margin-top: 2px;
+}
+
+/* ── Bullet list ── */
+#rdm-wrap .rdm-card ul {
+  list-style: none;
+  padding: 6px 18px 16px;
+  border-top: 1px solid #f0ece6;
+}
+#rdm-wrap .rdm-card ul li {
+  font-size: 12px; color: #2a3a4a; line-height: 1.55;
+  padding: 7px 0 7px 16px; position: relative;
+  border-bottom: 1px solid #f0ece6;
+}
+#rdm-wrap .rdm-card ul li:last-child { border-bottom: none; }
+#rdm-wrap .rdm-card ul li::before {
+  content: '▸'; position: absolute; left: 0;
+  font-size: 9px; top: 9px; color: #8b6040;
+}
+#rdm-wrap .rdm-card ul li strong { color: #0a1e3d; font-weight: 700; }
+
+/* ── Stem connecting card to road ── */
+#rdm-wrap .rdm-stem {
+  width: 2px; height: 74px; flex-shrink: 0;
+  background: linear-gradient(to bottom, rgba(10,30,61,0.25), rgba(0,180,196,0.7));
+  position: relative;
+}
+#rdm-wrap .rdm-stem::after {
+  content: ''; position: absolute; bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 5px; height: 5px; border-radius: 50%; background: #00b4c4;
+}
+
+/* ── Road row: pin + year label sitting on the road ── */
+#rdm-wrap .rdm-road-row {
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* ── Pin circle ── */
+#rdm-wrap .rdm-pin {
+  width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  box-shadow: 0 3px 16px rgba(0,0,0,0.28);
+  position: relative; z-index: 2;
+}
+#rdm-wrap .rdm-pin-navy { background: radial-gradient(circle at 35% 35%, #1a4a8a, #0a1e3d); }
+#rdm-wrap .rdm-pin-teal { background: radial-gradient(circle at 35% 35%, #30d0e0, #009baa); }
+
+
+/* ── Legend ── */
+#rdm-wrap .rdm-legend {
+  position: absolute; bottom: 86px; right: 48px;
+  background: linear-gradient(135deg, #0a1e3d 0%, #1a3560 100%);
+  color: #fff; padding: 20px 24px; border-radius: 14px;
+  width: 196px;
+  box-shadow: 0 12px 40px rgba(10,30,61,0.32);
+  z-index: 20;
+}
+#rdm-wrap .rdm-legend h2 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px; font-weight: 700; color: #fff; line-height: 1.1;
+}
+#rdm-wrap .rdm-legend h2 span { color: #00b4c4; }
+#rdm-wrap .rdm-legend-line {
+  width: 34px; height: 2px; background: #00b4c4;
+  border-radius: 2px; margin: 8px 0;
+}
+#rdm-wrap .rdm-legend p {
+  font-size: 11px; color: rgba(255,255,255,0.52);
+  line-height: 1.65; font-weight: 300;
+}

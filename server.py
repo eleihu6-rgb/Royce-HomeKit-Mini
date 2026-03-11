@@ -389,7 +389,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
     def serve_file(self, path):
         ext = os.path.splitext(path)[1].lower()
         mime = {'.html':'text/html','.js':'application/javascript',
-                '.css':'text/css','.json':'application/json'}.get(ext,'application/octet-stream')
+                '.css':'text/css','.json':'application/json',
+                '.svg':'image/svg+xml','.png':'image/png',
+                '.jpg':'image/jpeg','.jpeg':'image/jpeg'}.get(ext,'application/octet-stream')
         with open(path, 'rb') as f:
             data = f.read()
         self.send_response(200)

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROIs Crew Product Roadmap</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #1a2e4a;
+    --teal: #2ec4a9;
+    --brown: #8b5e3c;
+    --cream: #faf8f4;
+    --dark: #0d1b2a;
+    --mid: #2a4a6b;
+    --road: #2a2a2a;
+    --road-line: #ffffff;
+    --pin-teal: #2ec4a9;
+    --pin-navy: #1a3a5c;
+    --text-dark: #1a2e4a;
+    --text-muted: #5a7a9a;
+  }
+
+  body {
+    background: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* === HEADER === */
+  .header {
+    background: linear-gradient(135deg, var(--navy) 0%, #2a4a6b 60%, #1a3a50 100%);
+    padding: 48px 60px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 80% 50%, rgba(46,196,169,0.15) 0%, transparent 60%);
+  }
+  .header-inner { position: relative; z-index: 1; }
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+  .header h1 span { color: var(--teal); }
+  .header p {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.95rem;
+    margin-top: 8px;
+    font-weight: 300;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* === ROADMAP CONTAINER === */
+  .roadmap-wrap {
+    position: relative;
+    width: 100%;
+    padding: 0;
+    overflow: hidden;
+    background: var(--cream);
+  }
+
+  /* === SVG ROAD CANVAS === */
+  .road-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+  }
+
+  /* === CONTENT GRID === */
+  .roadmap-content {
+    position: relative;
+    z-index: 10;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    gap: 0;
+    min-height: 820px;
+    padding: 0 40px;
+  }
+
+  /* === MILESTONE COLUMN === */
+  .milestone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+
+  /* alternating up/down */
+  .milestone.up   { justify-content: flex-start; padding-top: 40px; }
+  .milestone.down { justify-content: flex-end;   padding-bottom: 40px; }
+
+  /* === CARD === */
+  .card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 20px 18px;
+    width: 180px;
+    box-shadow: 0 8px 32px rgba(26,46,74,0.12), 0 2px 8px rgba(26,46,74,0.08);
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-top: 3px solid var(--brown);
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(26,46,74,0.18);
+  }
+  .milestone.down .card { border-top: none; border-bottom: 3px solid var(--teal); }
+
+  .card-year {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--navy);
+    line-height: 1;
+  }
+  .card-half {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--teal);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .card ul { list-style: none; padding: 0; }
+  .card ul li {
+    font-size: 0.78rem;
+    color: #3a4a5a;
+    line-height: 1.5;
+    padding: 3px 0 3px 12px;
+    position: relative;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .card ul li:last-child { border-bottom: none; }
+  .card ul li::before {
+    content: '▸';
+    position: absolute; left: 0;
+    color: var(--brown);
+    font-size: 0.65rem;
+    top: 5px;
+  }
+  .milestone.down .card ul li::before { color: var(--teal); }
+  .card ul li strong { color: var(--navy); font-weight: 600; }
+
+  /* === PIN === */
+  .pin-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+  .milestone.up   .pin-wrap { margin-top: 16px; }
+  .milestone.down .pin-wrap { margin-bottom: 16px; flex-direction: column-reverse; }
+
+  .pin-stem {
+    width: 2px;
+    height: 60px;
+    background: linear-gradient(to bottom, rgba(26,46,74,0.3), rgba(46,196,169,0.6));
+    position: relative;
+  }
+  .pin-stem::before, .pin-stem::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--teal);
+  }
+  .pin-stem::before { top: 0; }
+  .pin-stem::after  { bottom: 0; }
+
+  .pin {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    position: relative;
+    z-index: 2;
+  }
+  .pin-teal { background: radial-gradient(circle at 35% 35%, #3fd9c0, #1da88f); }
+  .pin-navy { background: radial-gradient(circle at 35% 35%, #2a5a8a, #0d2540); }
+
+  /* === LEGEND BOX === */
+  .legend-box {
+    position: absolute;
+    bottom: 40px;
+    right: 60px;
+    background: linear-gradient(135deg, var(--navy), var(--mid));
+    color: white;
+    padding: 24px 32px;
+    border-radius: 16px;
+    width: 220px;
+    box-shadow: 0 12px 40px rgba(26,46,74,0.3);
+    z-index: 20;
+  }
+  .legend-box h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.1;
+  }
+  .legend-box h2 span { color: var(--teal); }
+  .legend-line {
+    width: 40px; height: 3px;
+    background: var(--teal);
+    border-radius: 2px;
+    margin: 10px 0;
+  }
+  .legend-box p {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* === ROAD SVG STYLING === */
+  .road-path {
+    fill: none;
+    stroke: #2b2b2b;
+    stroke-width: 80;
+    stroke-linecap: round;
+  }
+  .road-edge {
+    fill: none;
+    stroke: #3d3d3d;
+    stroke-width: 84;
+    stroke-linecap: round;
+  }
+  .road-dashes {
+    fill: none;
+    stroke: #ffffff;
+    stroke-width: 4;
+    stroke-dasharray: 24 20;
+    stroke-linecap: round;
+    opacity: 0.6;
+  }
+
+  /* === ANIMATIONS === */
+  .card { animation: fadeUp 0.6s ease both; }
+  .milestone:nth-child(1) .card { animation-delay: 0.1s; }
+  .milestone:nth-child(2) .card { animation-delay: 0.25s; }
+  .milestone:nth-child(3) .card { animation-delay: 0.4s; }
+  .milestone:nth-child(4) .card { animation-delay: 0.55s; }
+  .milestone:nth-child(5) .card { animation-delay: 0.7s; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* === FOOTER === */
+  .footer {
+    background: var(--navy);
+    color: rgba(255,255,255,0.4);
+    text-align: center;
+    font-size: 0.72rem;
+    padding: 14px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <h1>ROIs Crew <span>Product Roadmap</span></h1>
+    <p>Airline Crew Management System — 2026 → 2028</p>
+  </div>
+</div>
+
+<!-- ROADMAP -->
+<div class="roadmap-wrap" style="min-height:820px;">
+
+  <!-- SVG ROAD -->
+  <svg class="road-svg" viewBox="0 0 1400 820" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Road shadow/edge -->
+    <path class="road-edge"
+      d="M -50,560 C 100,560 200,540 280,500 C 360,460 380,380 460,340 C 540,300 580,320 700,320 C 820,320 860,260 940,230 C 1020,200 1060,220 1140,250 C 1220,280 1280,340 1450,360"
+      stroke="#1a1a1a" stroke-width="90" opacity="0.4"/>
+    <!-- Main road body -->
+    <path class="road-path"
+      d="M -50,560 C 100,560 200,540 280,500 C 360,460 380,380 460,340 C 540,300 580,320 700,320 C 820,320 860,260 940,230 C 1020,200 1060,220 1140,250 C 1220,280 1280,340 1450,360"
+      stroke="#2e2e2e" stroke-width="82"/>
+    <!-- Dashed center line -->
+    <path class="road-dashes"
+      d="M -50,560 C 100,560 200,540 280,500 C 360,460 380,380 460,340 C 540,300 580,320 700,320 C 820,320 860,260 940,230 C 1020,200 1060,220 1140,250 C 1220,280 1280,340 1450,360"/>
+  </svg>
+
+  <!-- MILESTONE CONTENT -->
+  <div class="roadmap-content">
+
+    <!-- 2026 1H — UP -->
+    <div class="milestone up">
+      <div class="card">
+        <div class="card-year">2026</div>
+        <div class="card-half">1H</div>
+        <ul>
+          <li><strong>Training</strong> schedule optimization</li>
+          <li><strong>Point Based</strong> flight & leave bidding</li>
+          <li>Historical <strong>crew preference analysis</strong> & personalized roster</li>
+          <li><strong>Allowance based</strong> budgeting</li>
+          <li><strong>AI-driven</strong> knowledge base</li>
+        </ul>
+      </div>
+      <div class="pin-wrap">
+        <div class="pin-stem"></div>
+        <div class="pin pin-navy">🗓️</div>
+      </div>
+    </div>
+
+    <!-- 2026 2H — DOWN -->
+    <div class="milestone down">
+      <div class="pin-wrap">
+        <div class="pin pin-teal">🤝</div>
+        <div class="pin-stem"></div>
+      </div>
+      <div class="card">
+        <div class="card-year">2026</div>
+        <div class="card-half">2H</div>
+        <ul>
+          <li><strong>North American PBS</strong>: full roster build by crew member</li>
+          <li><strong>PBS aiBuddy</strong>: heat map analysis & realistic bidding assistance</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 2027 1H — UP -->
+    <div class="milestone up">
+      <div class="card">
+        <div class="card-year">2027</div>
+        <div class="card-half">1H</div>
+        <ul>
+          <li>Day of Ops pairing & roster <strong>auto-recovery</strong></li>
+          <li>Duty swap with <strong>matching recommendation</strong></li>
+          <li><strong>AI-driven rule</strong> management & planning support for legality prediction</li>
+        </ul>
+      </div>
+      <div class="pin-wrap">
+        <div class="pin-stem"></div>
+        <div class="pin pin-navy">💡</div>
+      </div>
+    </div>
+
+    <!-- 2027 2H — DOWN -->
+    <div class="milestone down">
+      <div class="pin-wrap">
+        <div class="pin pin-teal">🛡️</div>
+        <div class="pin-stem"></div>
+      </div>
+      <div class="card">
+        <div class="card-year">2027</div>
+        <div class="card-half">2H</div>
+        <ul>
+          <li>Historical legality violation analysis</li>
+          <li>Significant irregular ops <strong>crew recovery</strong></li>
+          <li><strong>AI-driven recovery</strong> suggestion</li>
+          <li>Fully <strong>configurable</strong> optimization objectives</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 2028 — UP -->
+    <div class="milestone up">
+      <div class="card">
+        <div class="card-year">2028</div>
+        <div class="card-half">Full Year</div>
+        <ul>
+          <li><strong>Holistic</strong> optimization (PO, RO, TO)</li>
+          <li>Disruption recovery with <strong>aircraft integration</strong></li>
+          <li><strong>Scenario based</strong> analysis & decision making</li>
+          <li><strong>Interactive control</strong> for optimization runs</li>
+        </ul>
+      </div>
+      <div class="pin-wrap">
+        <div class="pin-stem"></div>
+        <div class="pin pin-teal">🎯</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- LEGEND BOX -->
+  <div class="legend-box">
+    <h2>Product<br><span>Roadmap</span></h2>
+    <div class="legend-line"></div>
+    <p>AI-powered crew management evolution from optimization to full autonomous recovery.</p>
+  </div>
+
+</div>
+
+<div class="footer">ROIs Crew Management System &nbsp;·&nbsp; Confidential</div>
+
+</body>
+</html>

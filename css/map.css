@@ -1,0 +1,206 @@
+/* ===== CLIENT MAP (embedded in About Client page) ===== */
+.map-section {
+  margin: 0 0 28px;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.07);
+  position: relative;
+}
+
+.map-section-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.map-section-label::before {
+  content: '';
+  width: 16px; height: 1px;
+  background: var(--accent-primary);
+}
+
+#page-client {
+  flex-direction: column;
+  height: calc(100vh - 64px);
+  padding-bottom: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+#page-client.active { display: flex; }
+#page-client .map-section {
+  flex: 1;
+  min-height: 0;
+  margin-bottom: 0;
+}
+
+#client-map-wrap {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: #060d1f;
+  overflow: hidden;
+}
+
+#client-map-wrap svg { width: 100%; height: 100%; }
+
+#client-map-wrap .graticule { fill: none; stroke: rgba(56,189,248,0.06); stroke-width: 0.5; }
+#client-map-wrap .sphere    { fill: #0b1a35; }
+#client-map-wrap .country   { fill: #0f2545; stroke: #1e3d6e; stroke-width: 0.5; transition: fill 0.2s; }
+
+#client-map-wrap .marker-group { cursor: pointer; }
+#client-map-wrap .marker-bg    { fill: white; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.7)); transition: transform 0.2s; }
+#client-map-wrap .marker-group:hover .marker-bg { filter: drop-shadow(0 4px 20px rgba(167,139,250,0.7)); }
+#client-map-wrap .ping { transform-origin: center center; transform-box: fill-box; }
+
+#map-header {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(180deg, rgba(6,13,31,0.97) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 10;
+}
+#map-header .mh-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text-primary);
+}
+#map-header .mh-title em { color: var(--accent-warning); font-style: normal; }
+#map-header .mh-sub {
+  font-size: 0.58rem;
+  color: var(--text-muted);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-top: 2px;
+  font-family: 'Share Tech Mono', monospace;
+}
+#map-header .mh-kpis { display: flex; gap: 24px; }
+#map-header .mh-kpi { text-align: center; }
+#map-header .mh-kpi-n {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--accent-warning);
+  line-height: 1;
+}
+#map-header .mh-kpi-l {
+  font-size: 0.52rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+#map-tip {
+  position: fixed;
+  background: rgba(11,26,53,0.97);
+  border: 1px solid rgba(56,189,248,0.5);
+  border-radius: 10px;
+  padding: 12px 16px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 9999;
+  min-width: 180px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(56,189,248,0.1);
+}
+#map-tip.show { opacity: 1; }
+#map-tip-name { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1rem; color: var(--text-primary); margin-bottom: 2px; }
+#map-tip-loc  { font-size: 0.6rem; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; font-family: 'Share Tech Mono', monospace; }
+#map-tip-img  { max-width: 150px; max-height: 52px; object-fit: contain; background: #fff; padding: 6px 10px; border-radius: 6px; display: block; }
+
+#map-legend {
+  position: absolute;
+  bottom: 56px; left: 16px;
+  background: rgba(11,26,53,0.92);
+  border: 1px solid rgba(56,189,248,0.15);
+  border-radius: 10px;
+  padding: 12px 16px;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+}
+#map-legend h3 {
+  font-size: 0.52rem; text-transform: uppercase; letter-spacing: 0.15em;
+  color: var(--text-muted); margin-bottom: 8px;
+  font-family: 'Share Tech Mono', monospace;
+}
+.map-leg { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; font-size: 0.65rem; color: var(--text-secondary); }
+.map-leg-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.map-leg-cnt { color: var(--text-muted); font-size: 0.55rem; margin-left: 2px; }
+
+#map-zoom-btns {
+  position: absolute;
+  bottom: 86px; right: 16px;
+  display: flex; flex-direction: column; gap: 5px;
+  z-index: 10;
+}
+.mzbtn {
+  width: 32px; height: 32px;
+  background: rgba(11,26,53,0.92);
+  border: 1px solid rgba(56,189,248,0.2);
+  border-radius: 7px;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  backdrop-filter: blur(8px);
+}
+.mzbtn:hover { background: rgba(30,64,128,0.9); border-color: #38bdf8; color: var(--text-primary); }
+
+/* ── Light Theme Overrides ── */
+[data-theme="light"] #client-map-wrap {
+  background: #e8edf5;
+}
+[data-theme="light"] #client-map-wrap .sphere {
+  fill: #d0d8e8;
+}
+[data-theme="light"] #client-map-wrap .country {
+  fill: #b8c4d8;
+  stroke: #9aa8c0;
+}
+[data-theme="light"] #client-map-wrap .graticule {
+  stroke: rgba(100, 120, 160, 0.15);
+}
+[data-theme="light"] .map-section {
+  border-color: rgba(0, 0, 0, 0.08);
+}
+[data-theme="light"] #map-header {
+  background: linear-gradient(180deg, rgba(232,237,245,0.97) 0%, transparent 100%);
+}
+[data-theme="light"] #map-tip {
+  background: rgba(255, 255, 255, 0.97);
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+[data-theme="light"] #map-tip-loc {
+  color: #555;
+}
+[data-theme="light"] #map-legend {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+[data-theme="light"] .mzbtn {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #1a1a2e;
+}
+[data-theme="light"] .mzbtn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.2);
+  color: #1a1a2e;
+}
+[data-theme="light"] #client-map-wrap .marker-bg {
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.15));
+}

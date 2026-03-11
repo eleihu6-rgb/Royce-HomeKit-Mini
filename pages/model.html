@@ -1,0 +1,120 @@
+    <div id="mdl-wrap">
+      <div class="mdl-layout">
+
+        <!-- Left: Module detail card (populated by JS on hover/click) -->
+        <div class="mdl-detail-panel" id="mdl-dp" style="--mdl-accent:#0055a5">
+          <div class="mdl-panel-content" id="mdl-pc"></div>
+        </div>
+
+        <!-- Centre: Spinning wheel + controls -->
+        <div class="mdl-scene-col">
+          <div class="mdl-scene">
+            <canvas id="mdl-cv"></canvas>
+            <div class="mdl-center-label">
+              <span class="mdl-main">ROIs<br>Crew</span>
+              <span class="mdl-sub">Crew Management Flow</span>
+              <span class="mdl-hint">↺ drag to spin</span>
+            </div>
+          </div>
+          <div class="mdl-spin-controls">
+            <button class="mdl-spin-btn" id="mdl-btnCCW">◀ CCW</button>
+            <button class="mdl-spin-btn active" id="mdl-btnStop">■ Stop</button>
+            <button class="mdl-spin-btn" id="mdl-btnCW">CW ▶</button>
+          </div>
+        </div>
+
+        <!-- Right: Value Measurement card -->
+        <div class="mdl-value-card" id="mdl-vc">
+
+          <div class="mdl-vc-header">
+            <div class="mdl-dp-cat">ROIs Crew · Proven Results</div>
+            <div class="mdl-dp-step">Performance Metrics</div>
+            <div class="mdl-dp-title">Value Measurement</div>
+          </div>
+
+          <div class="mdl-vc-body">
+
+            <!-- Pairing Optimizer -->
+            <div class="mdl-val-item">
+              <div class="mdl-val-module" style="--mod-color:#f9b825">Pairing Optimizer</div>
+              <div class="mdl-val-metric">Operational cost reduction <span class="mdl-val-num">&gt;5.24%</span></div>
+              <div class="mdl-val-details">
+                <div>Rostering cycle: 10+ days → 2 days</div>
+                <div>Crew utilization: +5% to +13%</div>
+              </div>
+              <div class="mdl-val-airlines">
+                <img src="images/Singapore_Airlines.png" class="mdl-val-logo" title="Singapore Airlines">
+                <img src="images/Air_China.png"          class="mdl-val-logo" title="Air China">
+              </div>
+            </div>
+
+            <!-- PBS -->
+            <div class="mdl-val-item">
+              <div class="mdl-val-module" style="--mod-color:#d05000">PBS</div>
+              <div class="mdl-val-metric">Crew satisfaction rate <span class="mdl-val-num">&gt;21%</span></div>
+              <div class="mdl-val-airlines">
+                <img src="images/Eva_Air.png" class="mdl-val-logo" title="EVA Air">
+              </div>
+            </div>
+
+            <!-- Tracking -->
+            <div class="mdl-val-item">
+              <div class="mdl-val-module" style="--mod-color:#3aaa3e">Tracking</div>
+              <div class="mdl-val-metric">Day-of-ops disruption reduction <span class="mdl-val-num">&gt;7%</span></div>
+              <div class="mdl-val-details">
+                <div>User efficiency: +60% via auto GD/APP/APIS</div>
+              </div>
+              <div class="mdl-val-airlines">
+                <img src="images/Eva_Air.png"      class="mdl-val-logo" title="EVA Air">
+                <img src="images/Thai_Airways.png" class="mdl-val-logo" title="THAI Airways">
+              </div>
+            </div>
+
+            <!-- Roster Optimizer -->
+            <div class="mdl-val-item">
+              <div class="mdl-val-module" style="--mod-color:#a03800">Roster Optimizer</div>
+              <div class="mdl-val-metric">Planning productivity <span class="mdl-val-num">&gt;57%</span></div>
+              <div class="mdl-val-details">
+                <div>Optimization speed: &gt;200% improvement</div>
+                <div>Scheduling fairness: &gt;41.4%</div>
+              </div>
+              <div class="mdl-val-airlines">
+                <img src="images/Air_China.png"    class="mdl-val-logo" title="Air China">
+                <img src="images/Thai_Airways.png" class="mdl-val-logo" title="THAI Airways">
+              </div>
+            </div>
+
+            <!-- Legality Engine -->
+            <div class="mdl-val-item">
+              <div class="mdl-val-module" style="--mod-color:#007080">Legality Engine</div>
+              <div class="mdl-val-metric">Full compliance — govt rules &amp; union agreements</div>
+              <div class="mdl-val-airlines">
+                <img src="images/Singapore_Airlines.png" class="mdl-val-logo" title="Singapore Airlines">
+                <img src="images/Thai_Airways.png"       class="mdl-val-logo" title="THAI Airways">
+                <img src="images/Air_China.png"          class="mdl-val-logo" title="Air China">
+                <img src="images/Alliance_Airlines.png"  class="mdl-val-logo" title="Alliance Airlines">
+              </div>
+            </div>
+
+            <!-- All proven airlines logos strip -->
+            <div class="mdl-val-logo-strip">
+              <div class="mdl-val-logo-title">Proven Airlines</div>
+              <div class="mdl-val-logo-row">
+                <img src="images/Singapore_Airlines.png" class="mdl-val-logo-lg" title="Singapore Airlines">
+                <img src="images/Air_China.png"          class="mdl-val-logo-lg" title="Air China">
+                <img src="images/Eva_Air.png"            class="mdl-val-logo-lg" title="EVA Air">
+                <img src="images/Thai_Airways.png"       class="mdl-val-logo-lg" title="THAI Airways">
+                <img src="images/Alliance_Airlines.png"  class="mdl-val-logo-lg" title="Alliance Airlines">
+              </div>
+            </div>
+
+          </div><!-- /mdl-vc-body -->
+        </div><!-- /mdl-value-card -->
+
+      </div><!-- /mdl-layout -->
+    </div><!-- /mdl-wrap -->
+
+    <button class="next-page-btn" onclick="showPage('roadmap')" title="Go to Roadmap">
+      <span class="next-page-label">Roadmap</span>
+      <svg viewBox="0 0 24 24" width="20" height="20"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" fill="currentColor"/></svg>
+    </button>

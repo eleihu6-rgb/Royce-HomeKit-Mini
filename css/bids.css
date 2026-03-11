@@ -1,0 +1,95 @@
+/* ===== BIDS TYPE ANALYSIS PAGE ===== */
+
+#page-bids {
+  padding: 0 32px 48px;
+  overflow-y: auto;
+  height: calc(100vh - 64px);
+  box-sizing: border-box;
+}
+
+.bids-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  margin-top: 4px;
+}
+
+/* ── Upload zone ── */
+.bids-upload-zone {
+  border: 1.5px dashed rgba(56, 189, 248, 0.3);
+  border-radius: 14px;
+  padding: 28px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  background: rgba(56, 189, 248, 0.03);
+  user-select: none;
+}
+.bids-upload-zone:hover,
+.bids-upload-zone.drag-over {
+  border-color: rgba(56, 189, 248, 0.7);
+  background: rgba(56, 189, 248, 0.08);
+}
+.bids-upload-zone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+/* ── File role badges ── */
+.file-role {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  padding: 1px 6px;
+  border-radius: 3px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.file-role.baseline {
+  background: rgba(56, 189, 248, 0.16);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+.file-role.compare {
+  background: rgba(251, 191, 36, 0.14);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.35);
+}
+
+/* ── Role note (shown when 2+ files) ── */
+.bids-role-note {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  padding: 6px 12px;
+  border-left: 2px solid rgba(56, 189, 248, 0.4);
+  background: rgba(56, 189, 248, 0.05);
+  border-radius: 0 6px 6px 0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .bids-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Light Theme Overrides ── */
+[data-theme="light"] .bids-upload-zone {
+  border-color: rgba(0, 0, 0, 0.12);
+  background: rgba(0, 0, 0, 0.01);
+}
+[data-theme="light"] .bids-upload-zone:hover,
+[data-theme="light"] .bids-upload-zone.drag-over {
+  border-color: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.03);
+}
+[data-theme="light"] .bids-role-note {
+  border-left-color: rgba(0, 0, 0, 0.15);
+  background: rgba(0, 0, 0, 0.02);
+}

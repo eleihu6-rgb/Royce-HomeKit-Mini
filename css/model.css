@@ -1,0 +1,205 @@
+/* ===== ABOUT MODEL PAGE ===== */
+#page-model {
+  height: calc(100vh - 64px);
+  padding: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+#mdl-wrap {
+  width: 100%; height: 100%;
+  background: #ffffff;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Barlow', sans-serif;
+  user-select: none; overflow: hidden;
+  padding: 16px 20px;
+  box-sizing: border-box;
+}
+#mdl-wrap .mdl-layout {
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+  animation: mdl-fadeIn .7s ease both;
+  height: 100%; width: 100%;
+}
+
+/* ── Scene column (canvas + spin buttons) ── */
+#mdl-wrap .mdl-scene-col {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 14px;
+  flex-shrink: 0; height: 100%;
+}
+#mdl-wrap .mdl-scene {
+  position: relative; flex-shrink: 0;
+}
+#mdl-wrap canvas { position: absolute; inset: 0; cursor: grab; display: block; }
+#mdl-wrap canvas.dragging { cursor: grabbing; }
+
+#mdl-wrap .mdl-center-label {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  text-align: center; pointer-events: none; z-index: 10;
+}
+#mdl-wrap .mdl-center-label .mdl-main {
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+  font-size: calc(var(--mdl-scale, 1) * 38px);
+  color: #0a1e3d; letter-spacing: 1px; line-height: 1; display: block;
+}
+#mdl-wrap .mdl-center-label .mdl-sub {
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 500;
+  font-size: calc(var(--mdl-scale, 1) * 10px);
+  color: #3a5080; letter-spacing: 2px; text-transform: uppercase;
+  display: block; margin-top: 4px; opacity: 0.8;
+}
+#mdl-wrap .mdl-center-label .mdl-hint {
+  font-size: calc(var(--mdl-scale, 1) * 9px);
+  color: #6a7ea0; letter-spacing: 1px; margin-top: 7px;
+  display: block; animation: mdl-pulse 2.5s ease-in-out infinite;
+}
+@keyframes mdl-pulse { 0%,100%{opacity:.4} 50%{opacity:.9} }
+
+/* ── Spin controls ── */
+#mdl-wrap .mdl-spin-controls {
+  display: flex; gap: 10px; flex-shrink: 0;
+}
+#mdl-wrap .mdl-spin-btn {
+  background: rgba(255,255,255,.75); border: 1px solid rgba(180,195,220,.6);
+  border-radius: 20px; padding: 6px 14px;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 600;
+  letter-spacing: 1.5px; color: #2a3a5a; cursor: pointer; text-transform: uppercase;
+  transition: background .2s;
+}
+#mdl-wrap .mdl-spin-btn:hover { background: rgba(255,255,255,.95); }
+#mdl-wrap .mdl-spin-btn.active { background: #0a1e3d; color: #fff; }
+
+/* ── Shared card shell (detail panel + value card) ── */
+#mdl-wrap .mdl-detail-panel,
+#mdl-wrap .mdl-value-card {
+  flex: 0 0 264px;
+  max-height: 100%; overflow-y: auto;
+  background: rgba(255,255,255,.93); backdrop-filter: blur(14px);
+  border-radius: 18px; padding: 0 0 20px;
+  box-shadow: 0 20px 60px rgba(0,20,60,.18), 0 0 0 1px rgba(255,255,255,.7);
+  scrollbar-width: thin; scrollbar-color: rgba(0,0,0,.12) transparent;
+}
+
+/* ── Detail panel header (dynamic accent via JS) ── */
+#mdl-wrap .mdl-dp-header {
+  padding: 20px 22px 16px; border-radius: 18px 18px 0 0;
+  background: var(--mdl-accent, #0055a5); position: relative; overflow: hidden;
+}
+#mdl-wrap .mdl-dp-header::after {
+  content: ''; position: absolute; right: -20px; bottom: -20px;
+  width: 90px; height: 90px; border-radius: 50%; background: rgba(255,255,255,.1);
+}
+#mdl-wrap .mdl-dp-cat {
+  display: inline-block; font-family: 'Barlow Condensed', sans-serif;
+  font-size: 9px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase;
+  color: rgba(255,255,255,.8); background: rgba(255,255,255,.18);
+  border-radius: 20px; padding: 3px 10px; margin-bottom: 8px;
+}
+#mdl-wrap .mdl-dp-step {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 600;
+  letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,.7); margin-bottom: 4px;
+}
+#mdl-wrap .mdl-dp-title {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 700;
+  color: #fff; letter-spacing: .5px; line-height: 1.1;
+}
+#mdl-wrap .mdl-dp-body { padding: 18px 22px 0; }
+#mdl-wrap .mdl-dp-desc { font-size: 12px; color: #445566; line-height: 1.65; margin-bottom: 16px; }
+#mdl-wrap .mdl-dp-feat-title {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 2.5px; text-transform: uppercase; color: #8899aa; margin-bottom: 10px;
+}
+#mdl-wrap .mdl-dp-feats { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+#mdl-wrap .mdl-dp-feats li {
+  display: flex; align-items: flex-start; gap: 9px;
+  font-size: 12px; color: #334455; line-height: 1.5;
+}
+#mdl-wrap .mdl-dp-feats li::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--mdl-accent, #0055a5); flex-shrink: 0; margin-top: 5px; transition: background .4s;
+}
+@keyframes mdl-panelIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+#mdl-wrap .mdl-panel-content { animation: mdl-panelIn .22s ease both; }
+
+/* ── Value Measurement card ── */
+#mdl-wrap .mdl-vc-header {
+  padding: 20px 22px 16px; border-radius: 18px 18px 0 0;
+  background: linear-gradient(135deg, #145a32 0%, #1d8348 100%);
+  position: relative; overflow: hidden;
+}
+#mdl-wrap .mdl-vc-header::after {
+  content: ''; position: absolute; right: -20px; bottom: -20px;
+  width: 90px; height: 90px; border-radius: 50%; background: rgba(255,255,255,.1);
+}
+#mdl-wrap .mdl-vc-body {
+  padding: 14px 16px 0;
+  display: flex; flex-direction: column; gap: 9px;
+}
+
+/* Value items */
+#mdl-wrap .mdl-val-item {
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,.07);
+  padding: 10px 12px;
+  background: rgba(248,250,252,.9);
+}
+#mdl-wrap .mdl-val-module {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--mod-color, #0055a5);
+  margin-bottom: 3px;
+}
+#mdl-wrap .mdl-val-metric {
+  font-size: 11.5px; color: #223344; line-height: 1.4; font-weight: 500;
+}
+#mdl-wrap .mdl-val-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 15px; font-weight: 700; color: var(--mod-color, #0055a5);
+}
+#mdl-wrap .mdl-val-details {
+  font-size: 10.5px; color: #667788; line-height: 1.5;
+  margin-top: 3px; display: flex; flex-direction: column; gap: 6px;
+}
+#mdl-wrap .mdl-val-details div::before { content: '› '; color: #aabbcc; }
+
+/* Inline logos per item */
+#mdl-wrap .mdl-val-airlines {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  margin-top: 7px; padding-top: 6px;
+  border-top: 1px solid rgba(0,0,0,.05);
+}
+#mdl-wrap .mdl-val-logo {
+  height: 15px; width: auto; max-width: 50px;
+  object-fit: contain; opacity: .65; filter: grayscale(20%);
+  transition: opacity .2s, filter .2s;
+}
+#mdl-wrap .mdl-val-logo:hover { opacity: 1; filter: none; }
+
+/* Bottom logo strip */
+#mdl-wrap .mdl-val-logo-strip {
+  margin-top: 4px; border-top: 1px solid rgba(0,0,0,.08); padding-top: 12px;
+}
+#mdl-wrap .mdl-val-logo-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 9px; font-weight: 700; letter-spacing: 2.5px;
+  text-transform: uppercase; color: #8899aa; margin-bottom: 10px;
+}
+#mdl-wrap .mdl-val-logo-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 6px; flex-wrap: wrap;
+}
+#mdl-wrap .mdl-val-logo-lg {
+  height: 26px; width: auto; max-width: 74px;
+  object-fit: contain; opacity: .8; filter: grayscale(15%);
+  transition: opacity .2s, filter .2s;
+}
+#mdl-wrap .mdl-val-logo-lg:hover { opacity: 1; filter: none; }
+
+/* ── Empty / default state ── */
+#mdl-wrap .mdl-vc-empty {
+  font-size: 12px; color: #7a8fa8; line-height: 1.65;
+  text-align: center; padding: 20px 10px;
+  font-style: italic;
+}
+
+
+@keyframes mdl-fadeIn { from{opacity:0;transform:scale(.97)} to{opacity:1;transform:scale(1)} }
