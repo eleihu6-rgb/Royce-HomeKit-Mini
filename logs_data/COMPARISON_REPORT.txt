@@ -1,0 +1,403 @@
+======================================================================
+  MySQL Load Comparison Report
+  Generated: 2026-03-14 06:29:16
+======================================================================
+
+SUMMARY: 347 OK | 0 mismatch | 46 errors
+
+── ERRORS ──
+  aircraft                                           error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  airport                                            error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1366 (HY000) at line 5: Incorrect integer value: 'bkkop1.doc@thaiairways.com' for column 'state' at row 1
+  apis_generate                                      error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  apis_generate_crew                                 error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  apis_method                                        error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  apis_rule                                          error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1406 (22001) at line 5: Data too long for column 'document_template' at row 1
+  apis_rule_detail                                   error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1292 (22007) at line 5: Incorrect datetime value: '1440' for column 'last_modified' at row 1
+  apis_setting                                       error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  apis_template_collection                           error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  assignment                                         error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  auditing_log                                       error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  check_rule_config                                  error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  checking_define                                    error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  checking_location                                  error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1406 (22001) at line 5: Data too long for column 'division' at row 1
+  commute_schedule                                   error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1406 (22001) at line 5: Data too long for column 'flight_flag' at row 1
+  composition_load                                   error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  crew                                               error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  crew_base                                          error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  crew_certificate                                   error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  crew_manday_cc_am                                  error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  crew_manday_fd                                     error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  crew_memo                                          error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  crew_message_send_record                           error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  crew_notification                                  error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  crew_profile                                       error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  crew_qualification                                 error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  crew_qualification_imp                             error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  crew_request_record                                error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  crew_request_record_detail                         error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  crew_team                                          error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  fatigue_result                                     error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  file_info                                          error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1406 (22001) at line 5: Data too long for column 'original_file_name' at row 24
+  fleet                                              error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  flight_bc                                          error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  flight_export                                      error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  flight_import_state                                error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  flight_notification_config                         error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  hotel_info                                         error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  hotel_match_rule                                   error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  hotel_match_rule_detail                            error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  kpi                                                error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  live_config                                        error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1406 (22001) at line 5: Data too long for column 'module' at row 1
+  none_crew                                          error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  none_crew_certificate                              error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  roster_publish_adjust                              error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+  tmp_var_id                                         error: mysql: [Warning] Using a password on the command line interface can be insecure. ERROR 1136 (21S01) at line 5: Column count doesn't match value count at row 1
+
+── OK (sql_rows == db_rows) ──
+  acknowledge_notification_config                    rows=         2
+  adhoc_crew_statistics                              rows=        23
+  airline_setting                                    rows=         1
+  airport_contact_for_hotel                          rows=         0
+  airport_database                                   rows=         1
+  airport_default                                    rows=         0
+  airport_imp                                        rows=         0
+  airport_temp                                       rows=         0
+  airport_zero                                       rows=         0
+  alert_center_mark_config                           rows=        50
+  alert_handling_log                                 rows=    530739
+  alert_message                                      rows=    530739
+  alert_setting                                      rows=         3
+  allowance_exchange_rate                            rows=        10
+  allowance_rate                                     rows=         0
+  allowance_scenario                                 rows=         1
+  allowance_scenario_calculate                       rows=         0
+  allowance_scenario_calculate_detail                rows=         0
+  allowance_scenario_calculate_detail_tg             rows=         0
+  allowance_scenario_calculate_pairing               rows=         0
+  allowance_scenario_calculate_pairing_detail        rows=         0
+  allowance_scenario_calculate_tg                    rows=         0
+  allowance_scenario_publish                         rows=         0
+  allowance_scenario_publish_detail                  rows=         0
+  allowance_scenario_publish_operation_record        rows=         0
+  allowance_ticket_cost                              rows=        12
+  allowance_type                                     rows=        10
+  apis_basic_info                                    rows=         1
+  apis_common_config                                 rows=         0
+  apis_config_item                                   rows=       464
+  apis_crew                                          rows=         0
+  apis_flight                                        rows=         0
+  apis_operation_log                                 rows=   1090177
+  apis_record                                        rows=         0
+  apis_resend_record                                 rows=      1059
+  apis_send_record                                   rows=    138436
+  app_used_record                                    rows=         0
+  assignment_group                                   rows=       123
+  assignment_group_map                               rows=       663
+  assignment_header                                  rows=        17
+  assignment_overlappable                            rows=        27
+  assignment_rpt_group                               rows=         2
+  assignment_rpt_group_map                           rows=         4
+  assignment_rule                                    rows=        14
+  assignment_search                                  rows=         6
+  attribute                                          rows=         3
+  auto_scheduling                                    rows=         0
+  ballot_leave_entitlement                           rows=         0
+  ballot_leave_record                                rows=         0
+  ballot_leave_record_detail                         rows=         0
+  base                                               rows=         1
+  best_fit_config                                    rows=         5
+  bidding_apply_record                               rows=         0
+  bidding_approval_result                            rows=         0
+  bidding_approval_setting                           rows=         0
+  bidding_approval_setting_phase                     rows=         0
+  bidding_point_assign_plan                          rows=         0
+  bidding_point_grant_record                         rows=         0
+  bidding_price_setting                              rows=         0
+  bidding_price_setting_daily_config                 rows=         0
+  bidding_quota                                      rows=         0
+  bidding_quota_del_detail                           rows=         0
+  bidding_quota_detail                               rows=         0
+  bidding_setting                                    rows=         0
+  bidding_setting_phase                              rows=         0
+  book_order                                         rows=         0
+  book_order_operation_log                           rows=         0
+  calculation_manday                                 rows=         9
+  certificate                                        rows=        14
+  check_point_config                                 rows=         1
+  checkin_staff                                      rows=         0
+  checking_generic_disclaimer                        rows=         0
+  chk_in_tm                                          rows=         0
+  city                                               rows=     10714
+  commute_builder                                    rows=         0
+  company_rank                                       rows=         0
+  company_rank_position                              rows=         0
+  composition                                        rows=        28
+  composition_rank                                   rows=       210
+  composition_refresh_log                            rows=        84
+  condition_library                                  rows=         0
+  conversion_table                                   rows=         0
+  country                                            rows=       255
+  country_apis_parameter                             rows=         0
+  cqf                                                rows=        63
+  cqf_param_validation                               rows=       120
+  cqf_parameter                                      rows=       211
+  cqf_set                                            rows=        49
+  crew_announcement_record                           rows=         0
+  crew_attendant                                     rows=         0
+  crew_base_imp                                      rows=         0
+  crew_bidding_allocation                            rows=         0
+  crew_bidding_approval_result                       rows=         0
+  crew_bidding_code_points_log                       rows=         0
+  crew_bidding_entitlements                          rows=         0
+  crew_bidding_points                                rows=         0
+  crew_bidding_points_log                            rows=         0
+  crew_company_rank                                  rows=         0
+  crew_days_off_detail                               rows=         0
+  crew_days_off_entitlements                         rows=         0
+  crew_days_off_request                              rows=         0
+  crew_duty_manday_cc_am                             rows=         0
+  crew_duty_manday_fd                                rows=         0
+  crew_dynamic_seniority                             rows=         0
+  crew_emquiz                                        rows=     70176
+  crew_entitlement                                   rows=         0
+  crew_fleet                                         rows=     23906
+  crew_fleet_exp                                     rows=         0
+  crew_fleet_imp                                     rows=         0
+  crew_flight_config_date                            rows=         0
+  crew_flight_config_kpi                             rows=         0
+  crew_fly_preference                                rows=         1
+  crew_fly_together                                  rows=         0
+  crew_friend                                        rows=         0
+  crew_guarantee_hour                                rows=         0
+  crew_imp                                           rows=         0
+  crew_kpi_adjust                                    rows=         0
+  crew_language                                      rows=         0
+  crew_leave_temp                                    rows=      1476
+  crew_lic_instructor                                rows=         0
+  crew_license                                       rows=         0
+  crew_manday_export                                 rows=         0
+  crew_manday_import_state                           rows=         0
+  crew_mark                                          rows=       103
+  crew_notice_email_send_record                      rows=         0
+  crew_notice_management                             rows=         0
+  crew_notice_management_log                         rows=         0
+  crew_notice_send_config                            rows=         0
+  crew_notice_send_record                            rows=         0
+  crew_notification_click                            rows=      1471
+  crew_pay_details                                   rows=         0
+  crew_preference                                    rows=         0
+  crew_query_collection                              rows=        42
+  crew_rank                                          rows=      8193
+  crew_rank_imp                                      rows=         0
+  crew_rank_search                                   rows=         0
+  crew_recency_report                                rows=     15371
+  crew_recurrent                                     rows=         0
+  crew_request                                       rows=         0
+  crew_request_detail                                rows=         0
+  crew_request_entitlements                          rows=         0
+  crew_request_memo                                  rows=      2056
+  crew_rp_recency                                    rows=    114702
+  crew_seniority                                     rows=         0
+  crew_status                                        rows=      8665
+  crew_suspension                                    rows=         0
+  crew_swap_block_hour                               rows=     22442
+  crew_team_imp                                      rows=         0
+  crew_training                                      rows=         0
+  crewse-rank-position                               rows=         0
+  cta_crew_report                                    rows=      7847
+  cta_crew_report_export                             rows=        75
+  cta_send_info                                      rows=      7847
+  cta_send_info_ignore                               rows=         0
+  dat_tmp                                            rows=    112054
+  date_holder                                        rows=         0
+  daylight_saving                                    rows=         0
+  delete_operation_ver                               rows=         0
+  deleted                                            rows=         0
+  department                                         rows=         3
+  department_group                                   rows=         2
+  device                                             rows=         0
+  device_disabled                                    rows=         0
+  division                                           rows=         2
+  division_construction                              rows=         2
+  duty_code2                                         rows=      6187
+  duty_code_logic                                    rows=         0
+  duty_code_type_comp                                rows=         0
+  effe_period                                        rows=         5
+  email_sending_config                               rows=         0
+  email_sending_record                               rows=         0
+  encrypt_setting                                    rows=         0
+  entitlements_assign_plan                           rows=         0
+  entitlements_grant_record                          rows=         0
+  exit_and_entry_inventory                           rows=         0
+  export_result                                      rows=         0
+  external_link                                      rows=         0
+  fairness_qual                                      rows=         0
+  fairness_report_frame                              rows=         0
+  fairness_target                                    rows=         0
+  fairness_target_day                                rows=         0
+  fairness_target_month                              rows=         0
+  fairness_target_qual                               rows=         0
+  fairness_west_south                                rows=         0
+  fatigue_colour                                     rows=        10
+  fatigue_tmp                                        rows=         0
+  file_info_of_user_guide                            rows=         0
+  filiale                                            rows=         1
+  fleet_access_control                               rows=      3168
+  flight_adjust_log                                  rows=         0
+  flight_apis_parameter                              rows=         0
+  flight_assignment_map                              rows=        21
+  flight_blh_contract                                rows=         0
+  flight_blh_history                                 rows=         0
+  flight_booking_report                              rows=         0
+  flight_booking_report_update                       rows=         0
+  flight_check_point                                 rows=         0
+  flight_composition                                 rows=    716322
+  flight_manifest                                    rows=         0
+  flight_memo                                        rows=        16
+  flight_none_crew                                   rows=     16509
+  flight_pause_setting                               rows=       240
+  flight_pause_setting_log                           rows=        82
+  flight_publish                                     rows=         0
+  flight_request_rank                                rows=        14
+  flight_seatbooking                                 rows=         4
+  flight_tmp_store                                   rows=      2668
+  flight_write_back_log                              rows=        10
+  geneva_roster                                      rows=         0
+  ground_duty_request                                rows=         0
+  ground_meal_setting                                rows=         0
+  guarantee_fly_hours                                rows=         0
+  handover_log                                       rows=         0
+  heart_task                                         rows=         0
+  heart_task_detail                                  rows=         0
+  history_crew_statistics                            rows=    149600
+  history_department_statistics                      rows=         0
+  holiday                                            rows=        48
+  hotel                                              rows=         0
+  hotel_booking_report                               rows=         0
+  hotel_booking_report_update                        rows=         0
+  hotel_checking                                     rows=         0
+  hotel_checking_del_log                             rows=         0
+  hotel_info_cost_detail                             rows=        74
+  image                                              rows=         0
+  inorout_record                                     rows=         0
+  instructor_qual                                    rows=         0
+  inventory_crew                                     rows=         0
+  journey_log_template                               rows=        40
+  landing_data                                       rows=     84818
+  language                                           rows=         4
+  language_requirements                              rows=         0
+  lc                                                 rows=         0
+  leave_ballot                                       rows=         0
+  leave_ballot_crew                                  rows=         0
+  leave_ballot_request                               rows=         0
+  leave_ballot_slots_points                          rows=         0
+  leave_crew_entitlement                             rows=         0
+  limit_config                                       rows=         2
+  master_pairing_report_export                       rows=         1
+  mcl_send_info                                      rows=         0
+  message_log                                        rows=         0
+  mp_parameter                                       rows=         0
+  mp_parameter_set                                   rows=         0
+  notification_define                                rows=         0
+  optimization_necessity                             rows=         9
+  orders_sending_log                                 rows=      3502
+  orders_sending_log_booking_detail                  rows=     47923
+  orders_sending_log_detail                          rows=      3609
+  orders_sending_setting                             rows=        49
+  ovlap_lve_notice                                   rows=       730
+  pairing_duty_node_ver                              rows=         0
+  pairing_to_cmx_record                              rows=         0
+  pairing_ver                                        rows=         0
+  passport_match_rule                                rows=         0
+  pay_calculation_log                                rows=         0
+  pay_code                                           rows=         0
+  pay_crew_group                                     rows=         0
+  pay_flt_hours_detail                               rows=         0
+  posting                                            rows=         0
+  print_duty_record                                  rows=         0
+  print_record                                       rows=         0
+  qp_qualification_project_age                       rows=         0
+  qq_crew_roster_requests                            rows=         0
+  qual_combination_restriction                       rows=         0
+  qual_extension_config                              rows=         0
+  report_frame                                       rows=         0
+  request_approval_order                             rows=         0
+  request_phase_period                               rows=         0
+  room_allocation_rule                               rows=         0
+  route_radiation_config                             rows=         0
+  rule_param_validation                              rows=         0
+  sby_import                                         rows=         0
+  simulate_login_log                                 rows=         0
+  sny_request                                        rows=         0
+  ssim_missing_flight                                rows=         0
+  standard_course                                    rows=         0
+  stu_for_pre_lock_teacher                           rows=         0
+  sync_config                                        rows=         0
+  tag_super_category                                 rows=         0
+  tag_super_category_map                             rows=         0
+  task_swap_task_publish                             rows=         0
+  teaching                                           rows=         0
+  teaching_cross_rank                                rows=         0
+  teaching_detail                                    rows=         0
+  teaching_detail_model                              rows=         0
+  teaching_forbid_flight                             rows=         0
+  teaching_group_limit                               rows=         0
+  teaching_num_limit                                 rows=         0
+  teaching_prefer_flight                             rows=         0
+  temp_records_to_keep                               rows=         0
+  time_block_plan                                    rows=         0
+  tm_course_brief                                    rows=         0
+  tm_course_preposition                              rows=         0
+  tm_course_role_device                              rows=         0
+  tm_course_time                                     rows=         0
+  tm_exemption_course                                rows=         0
+  tm_footprint_course_ip_role                        rows=         0
+  tm_footprint_course_ip_role_base                   rows=         0
+  tm_footprint_course_ip_role_qual                   rows=         0
+  tm_footprint_course_ipck                           rows=         0
+  tm_footprint_course_limitation                     rows=         0
+  tm_footprint_course_more                           rows=         0
+  tm_footprint_course_more_leg                       rows=         0
+  tm_footprint_course_role                           rows=         0
+  tm_footprint_course_role_qual                      rows=         0
+  tm_footprint_course_trainee                        rows=         0
+  tm_footprint_pip                                   rows=         0
+  tm_pairing_chart                                   rows=         0
+  tm_pairing_chart_course                            rows=         0
+  tm_pairing_chart_role                              rows=         0
+  tm_pairing_chart_role_qual                         rows=         0
+  tm_program_buddy                                   rows=         0
+  tm_program_buddy_course                            rows=         0
+  tm_program_buddy_time                              rows=         0
+  tm_program_course_ip_role                          rows=         0
+  tm_program_course_ip_role_base                     rows=         0
+  tm_program_course_ip_role_qual                     rows=         0
+  tm_program_course_ipck                             rows=         0
+  tm_program_course_limitation                       rows=         0
+  tm_program_course_more                             rows=         0
+  tm_program_course_more_leg                         rows=         0
+  tm_program_course_pnr                              rows=         0
+  tm_program_course_role                             rows=         0
+  tm_program_course_role_qual                        rows=         0
+  tm_program_pip                                     rows=         0
+  tm_program_rest_pattern                            rows=         0
+  tm_training_config                                 rows=         0
+  tmp_id                                             rows=         0
+  tmp_long_id                                        rows=         0
+  tmp_long_id_session                                rows=         0
+  training                                           rows=         0
+  training_course                                    rows=         0
+  training_due                                       rows=         0
+  training_footprint                                 rows=         0
+  training_footprint_detail                          rows=         0
+  training_plan_demanded_trianee                     rows=         0
+  training_plan_structure                            rows=         0
+  training_qualification                             rows=         0
+  training_roster                                    rows=         0
+  training_session                                   rows=         0
+  training_session_detail                            rows=         0
+  training_venue                                     rows=         0
+  venue                                              rows=         0
+  voyage_duty                                        rows=         0
+  voyage_duty_detail                                 rows=         0
+  voyage_fuel_record                                 rows=         0

@@ -32,6 +32,7 @@ document.getElementById('init-time').textContent = new Date().toUTCString().spli
 const breadcrumbs = {
   bids:      'BIDS TYPE ANALYSIS',
   converter: 'PDF → EXCEL CONVERTER',
+  loadsql:   'LOAD SQL INTO DB',
   dashboard: 'DASHBOARD',
   about:     'ABOUT US',
   client:    'ABOUT CLIENT',
@@ -63,7 +64,7 @@ async function showPage(id) {
 
   // Set active nav
   const navItems = document.querySelectorAll('.nav-item');
-  const labels = {bids:'Bids Type Analysis', converter:'PDF → Excel Converter', dashboard:'Dashboard', about:'Us', client:'Client', model:'Model', roadmap:'Roadmap'};
+  const labels = {bids:'Bids Type Analysis', converter:'PDF → Excel Converter', loadsql:'Load SQL into DB', dashboard:'Dashboard', about:'Us', client:'Client', model:'Model', roadmap:'Roadmap'};
   navItems.forEach(item => {
     const label = item.querySelector('.nav-label');
     if (label && label.textContent.trim() === labels[id]) {
@@ -72,6 +73,7 @@ async function showPage(id) {
   });
 
   // Lazy-init handlers after page inject
+  if (id === 'loadsql') setTimeout(initLoadSqlPage, 50);
   if (id === 'bids')   setTimeout(initBidsPage,  50);
   if (id === 'about')  setTimeout(initAboutMap,  50);
   if (id === 'client') setTimeout(initClientMap, 50);

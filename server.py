@@ -4,9 +4,20 @@ NAVOPS — PDF Roster Parser Backend
 Run: python3 server.py
 Serves the HTML on :8080 and the parse API on POST /api/convert
 """
-import http.server, json, os, re, io, traceback
+import http.server, json, os, re, io, traceback, subprocess, threading, uuid, time
+import concurrent.futures
 from collections import defaultdict
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qs
+
+ANALYSE_WORKERS = 4
+TABLE_LIMIT     = 50
+
+# ─── Background job store ───────────────────────────────────────────────────────
+_jobs = {}   # job_id -> {'status': 'running'|'done'|'error', 'tables': [], 'progress': N, 'error': str}
+
+SQL_DATA_DIR   = '/home/eleihu6/rois_tg_live_load'
+MYSQL_CMD      = ['mysql', '-u', 'debian-sys-maint', '-pR2QY1jwpPm0Vxoyf', 'rois_tg_live_prod']
+WHITELIST_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'table_whitelist.md')
 
 try:
     import pdfplumber
@@ -292,12 +303,24 @@ def parse_pdf_bytes(pdf_bytes):
 # ─── HTTP Handler ─────────────────────────────────────────────────────────────
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+class ThreadingHTTPServer(http.server.ThreadingHTTPServer):
+    pass
+
 class Handler(http.server.BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
         print(f'  {self.address_string()} {fmt % args}')
 
     def do_GET(self):
         path = urlparse(self.path).path
+        if path == '/api/sql-files':
+            self.handle_sql_files()
+            return
+        if path == '/api/whitelist':
+            self.handle_whitelist()
+            return
+        if path == '/api/analyse-status':
+            self.handle_analyse_status()
+            return
         if path in ('/', '/index.html'):
             path = '/ROIs_Crew_platform.html'
         filepath = os.path.join(BASE_DIR, path.lstrip('/'))
@@ -309,6 +332,12 @@ class Handler(http.server.BaseHTTPRequestHandler):
     def do_POST(self):
         if self.path == '/api/convert':
             self.handle_convert()
+        elif self.path == '/api/analyse-sql':
+            self.handle_analyse_sql()
+        elif self.path == '/api/load-sql':
+            self.handle_load_sql()
+        elif self.path == '/api/whitelist-toggle':
+            self.handle_whitelist_toggle()
         else:
             self.send_error(404)
 
@@ -386,6 +415,339 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(err)
 
+    def handle_whitelist(self):
+        try:
+            tables = []
+            if os.path.isfile(WHITELIST_PATH):
+                with open(WHITELIST_PATH, 'r') as f:
+                    for line in f:
+                        line = line.strip()
+                        if line and not line.startswith('#'):
+                            if ':' in line:
+                                name, flag = line.rsplit(':', 1)
+                                load_data = flag.upper() == 'Y'
+                            else:
+                                name, load_data = line, False
+                            tables.append({'name': name, 'load_data': load_data})
+            payload = json.dumps({'tables': tables, 'count': len(tables)}).encode()
+            self.send_response(200)
+            self._cors()
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', len(payload))
+            self.end_headers()
+            self.wfile.write(payload)
+        except Exception as e:
+            err = json.dumps({'error': str(e)}).encode()
+            self.send_response(500)
+            self._cors()
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', len(err))
+            self.end_headers()
+            self.wfile.write(err)
+
+    def handle_whitelist_toggle(self):
+        """Toggle the load_data flag (Y/N) for a table in table_whitelist.md."""
+        try:
+            length  = int(self.headers.get('Content-Length', 0))
+            body    = json.loads(self.rfile.read(length))
+            table   = body.get('table', '').strip()
+            enabled = bool(body.get('load_data', False))
+            if not table:
+                raise ValueError('table name required')
+
+            lines = []
+            if os.path.isfile(WHITELIST_PATH):
+                with open(WHITELIST_PATH, 'r') as f:
+                    lines = f.readlines()
+
+            new_lines = []
+            found = False
+            for line in lines:
+                stripped = line.rstrip('\n')
+                if stripped.startswith('#') or not stripped.strip():
+                    new_lines.append(line)
+                    continue
+                if ':' in stripped:
+                    name = stripped.rsplit(':', 1)[0]
+                else:
+                    name = stripped
+                if name == table:
+                    new_lines.append(f'{name}:{"Y" if enabled else "N"}\n')
+                    found = True
+                else:
+                    new_lines.append(line)
+
+            if not found:
+                new_lines.append(f'{table}:{"Y" if enabled else "N"}\n')
+
+            with open(WHITELIST_PATH, 'w') as f:
+                f.writelines(new_lines)
+
+            payload = json.dumps({'ok': True, 'table': table, 'load_data': enabled}).encode()
+            self.send_response(200)
+            self._cors()
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', len(payload))
+            self.end_headers()
+            self.wfile.write(payload)
+        except Exception as e:
+            err = json.dumps({'error': str(e)}).encode()
+            self.send_response(500)
+            self._cors()
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', len(err))
+            self.end_headers()
+            self.wfile.write(err)
+
+    def handle_sql_files(self):
+        try:
+            files = []
+            for root, dirs, fnames in os.walk(SQL_DATA_DIR):
+                dirs.sort()
+                for fname in sorted(fnames):
+                    full = os.path.join(root, fname)
+                    rel  = os.path.relpath(full, SQL_DATA_DIR)
+                    files.append({
+                        'name':     fname,
+                        'rel_path': rel,
+                        'size':     os.path.getsize(full),
+                    })
+            payload = json.dumps({'files': files}).encode()
+            self.send_response(200)
+            self._cors()
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', len(payload))
+            self.end_headers()
+            self.wfile.write(payload)
+        except Exception as e:
+            err = json.dumps({'error': str(e)}).encode()
+            self.send_response(500)
+            self._cors()
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', len(err))
+            self.end_headers()
+            self.wfile.write(err)
+
+    def handle_analyse_sql(self):
+        try:
+            length = int(self.headers.get('Content-Length', 0))
+            body   = json.loads(self.rfile.read(length))
+            rel    = body.get('file', '')
+            full   = os.path.realpath(os.path.join(SQL_DATA_DIR, rel))
+            if not full.startswith(os.path.realpath(SQL_DATA_DIR) + os.sep):
+                raise ValueError('Path traversal not allowed')
+            if not full.endswith('.sql'):
+                raise ValueError('Only .sql files are allowed')
+
+            job_id = str(uuid.uuid4())[:8]
+            _jobs[job_id] = {
+                'status': 'running', 'phase': 'scanning',
+                'tables': [], 'progress': 0, 'total': 0,
+                'workers': ANALYSE_WORKERS, 'limit': TABLE_LIMIT, 'error': '',
+                'worker_status': [{'id': i+1, 'state': 'STANDBY', 'table': ''} for i in range(ANALYSE_WORKERS)]
+            }
+
+            def _count_rows(file_path, start_off, end_off):
+                count = 0
+                try:
+                    with open(file_path, 'rb') as fh:
+                        fh.seek(start_off)
+                        while True:
+                            if fh.tell() >= end_off:
+                                break
+                            line = fh.readline()
+                            if not line:
+                                break
+                            if line.startswith(b'INSERT INTO'):
+                                count += 1
+                except Exception:
+                    pass
+                return count
+
+            def run():
+                try:
+                    whitelist = {}  # name -> load_data bool
+                    if os.path.isfile(WHITELIST_PATH):
+                        with open(WHITELIST_PATH) as f:
+                            for line in f:
+                                line = line.strip()
+                                if line and not line.startswith('#'):
+                                    if ':' in line:
+                                        name, flag = line.rsplit(':', 1)
+                                        whitelist[name] = flag.upper() == 'Y'
+                                    else:
+                                        whitelist[line] = False
+
+                    # Phase 1: locate all table byte-offsets with grep -b (single fast pass)
+                    _jobs[job_id]['phase'] = 'scanning'
+                    for w in _jobs[job_id]['worker_status']:
+                        w['state'] = 'AWAITING OFFSETS'
+                    gp = subprocess.run(
+                        ['grep', '-b', '^-- Table structure for ', full],
+                        capture_output=True, text=True, timeout=600
+                    )
+                    entries = []
+                    for line in gp.stdout.splitlines():
+                        try:
+                            colon  = line.index(':')
+                            offset = int(line[:colon])
+                            name   = line[colon+1:].replace('-- Table structure for ', '').strip()
+                            entries.append((offset, name))
+                        except Exception:
+                            pass
+
+                    # Filter to only tables in whitelist with load_data=True, then cap
+                    entries = [(off, name) for off, name in entries if whitelist.get(name) is True]
+                    entries = entries[:TABLE_LIMIT]
+                    file_size = os.path.getsize(full)
+                    _jobs[job_id]['total'] = len(entries)
+                    _jobs[job_id]['phase'] = 'counting'
+
+                    # Immediately publish all table names with sql_rows=None (pending)
+                    init_tables = [
+                        {'name': name, 'sql_rows': None, 'in_whitelist': name in whitelist,
+                         'load_data': whitelist.get(name, False)}
+                        for _, name in entries
+                    ]
+                    _jobs[job_id]['tables'] = init_tables
+
+                    # Phase 2: parallel row count — workers update counts in-place as they finish
+                    tasks = []
+                    for i, (offset, name) in enumerate(entries):
+                        end_off = entries[i+1][0] if i+1 < len(entries) else file_size
+                        tasks.append((full, offset, end_off, name, i))
+
+                    lock = threading.Lock()
+                    # Map thread ident → worker slot (0-based)
+                    thread_slot = {}
+                    slot_counter = [0]
+
+                    for w in _jobs[job_id]['worker_status']:
+                        w['state'] = 'IDLE'
+                        w['table'] = ''
+
+                    def worker(task):
+                        file_path, start_off, end_off, name, idx = task
+                        tid = threading.current_thread().ident
+
+                        # Assign a stable worker slot to this thread
+                        with lock:
+                            if tid not in thread_slot:
+                                thread_slot[tid] = slot_counter[0] % ANALYSE_WORKERS
+                                slot_counter[0] += 1
+                            slot = thread_slot[tid]
+                            ws = _jobs[job_id]['worker_status'][slot]
+                            ws['state'] = 'COUNTING'
+                            ws['table'] = name
+
+                        count = _count_rows(file_path, start_off, end_off)
+
+                        with lock:
+                            _jobs[job_id]['worker_status'][slot]['state'] = 'DONE'
+                            _jobs[job_id]['worker_status'][slot]['table'] = name
+                            _jobs[job_id]['tables'][idx]['sql_rows'] = count
+                            _jobs[job_id]['progress'] = sum(
+                                1 for t in _jobs[job_id]['tables'] if t['sql_rows'] is not None
+                            )
+
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=ANALYSE_WORKERS) as ex:
+                        list(ex.map(worker, tasks))
+
+                    for w in _jobs[job_id]['worker_status']:
+                        w['state'] = 'DONE'
+
+                    _jobs[job_id]['progress'] = len(entries)
+                    _jobs[job_id]['status']   = 'done'
+
+                except Exception as ex:
+                    _jobs[job_id]['status'] = 'error'
+                    _jobs[job_id]['error']  = str(ex)
+
+            threading.Thread(target=run, daemon=True).start()
+
+            payload = json.dumps({'job_id': job_id}).encode()
+            self.send_response(200)
+            self._cors()
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', len(payload))
+            self.end_headers()
+            self.wfile.write(payload)
+        except Exception as e:
+            err = json.dumps({'error': str(e), 'trace': traceback.format_exc()}).encode()
+            self.send_response(500)
+            self._cors()
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', len(err))
+            self.end_headers()
+            self.wfile.write(err)
+
+    def handle_analyse_status(self):
+        try:
+            qs     = parse_qs(urlparse(self.path).query)
+            job_id = qs.get('job', [''])[0]
+            job    = _jobs.get(job_id)
+            if not job:
+                raise ValueError(f'Unknown job: {job_id}')
+            payload = json.dumps(job).encode()
+            self.send_response(200)
+            self._cors()
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', len(payload))
+            self.end_headers()
+            self.wfile.write(payload)
+        except Exception as e:
+            err = json.dumps({'error': str(e)}).encode()
+            self.send_response(500)
+            self._cors()
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', len(err))
+            self.end_headers()
+            self.wfile.write(err)
+
+    def handle_load_sql(self):
+        try:
+            length = int(self.headers.get('Content-Length', 0))
+            body   = json.loads(self.rfile.read(length))
+            rel    = body.get('file', '')
+            full   = os.path.realpath(os.path.join(SQL_DATA_DIR, rel))
+            if not full.startswith(os.path.realpath(SQL_DATA_DIR) + os.sep):
+                raise ValueError('Path traversal not allowed')
+            if not full.endswith('.sql'):
+                raise ValueError('Only .sql files are allowed')
+
+            split_script  = os.path.join(BASE_DIR, 'split_sql.py')
+            import_script = os.path.join(SQL_DATA_DIR, 'run_import.sh')
+            tables_dir    = os.path.join(SQL_DATA_DIR, 'tables')
+
+            # Step 1: split in background
+            subprocess.Popen(
+                ['bash', '-c',
+                 f'python3 {split_script} {full} --out-dir {tables_dir} --quiet'
+                 f' && bash {import_script}'
+                 f' >> /tmp/royce-loadsql.log 2>&1'],
+                close_fds=True
+            )
+            result = type('R', (), {'returncode': 0, 'stdout': 'Split + import started in background. Check /tmp/royce-loadsql.log', 'stderr': ''})()
+            payload = json.dumps({
+                'exit_code': result.returncode,
+                'stdout':    result.stdout,
+                'stderr':    result.stderr,
+            }).encode()
+            self.send_response(200)
+            self._cors()
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', len(payload))
+            self.end_headers()
+            self.wfile.write(payload)
+        except Exception as e:
+            err = json.dumps({'error': str(e), 'trace': traceback.format_exc()}).encode()
+            self.send_response(500)
+            self._cors()
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', len(err))
+            self.end_headers()
+            self.wfile.write(err)
+
     def serve_file(self, path):
         ext = os.path.splitext(path)[1].lower()
         mime = {'.html':'text/html','.js':'application/javascript',
@@ -402,8 +764,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
 
 
 if __name__ == '__main__':
-    PORT = 8080
-    server = http.server.HTTPServer(('localhost', PORT), Handler)
+    PORT = 8088
+    server = ThreadingHTTPServer(('0.0.0.0', PORT), Handler)
     print(f'NAVOPS backend running → http://localhost:{PORT}/')
     print(f'API endpoint: POST http://localhost:{PORT}/api/convert')
     print('Press Ctrl+C to stop.')

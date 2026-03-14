@@ -3,8 +3,10 @@
 .AppleDouble
 .LSOverride
 
-# Claude Code session files
-.claude/
+# Claude Code session files (exclude memory/projects, keep skills)
+.claude/projects/
+.claude/settings*
+.claude/todos*
 
 # Debug artifacts
 debug/

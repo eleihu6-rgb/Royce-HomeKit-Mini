@@ -1,0 +1,31 @@
+=== MySQL Load Progress Report ===
+Last updated: 2026-03-09 12:53:34
+
+Files done   : 63 / 612  (10%)
+Files remaining: 206
+Files failed : 33
+Import running: NO
+
+MySQL DB stats:
+tables_with_data	est_rows	data_GB
+78	8,198,654	1.41
+
+Disk space: /dev/root        67G   43G   25G  64% /
+
+Status: STOPPED
+
+--- Last 10 completed ---
+[2026-03-09 12:27:40] OK      | tbl_0609 | table=warn_column | sql_rows=18 | db_rows=18
+[2026-03-09 12:27:58] OK      | tbl_0332 | table=pairing_composition | sql_rows=334039 | db_rows=334039
+[2026-03-09 12:27:57] OK      | tbl_0329 | table=pairing | sql_rows=181743 | db_rows=181743
+[2026-03-09 12:28:17] OK      | tbl_0336 | table=pairing_duty_3 | sql_rows=0
+0 | db_rows=0
+[2026-03-09 12:28:15] OK      | tbl_0335 | table=pairing_duty | sql_rows=237575 | db_rows=237575
+[2026-03-09 12:28:17] OK      | tbl_0337 | table=pairing_duty_node | sql_rows=950300 | db_rows=950300
+
+--- Last 5 failures ---
+[2026-03-09 12:27:57] FAILED  | tbl_0328 | table=ovlap_lve_notice_bk0126 | sql_rows=5 | db_rows=- | error: ERROR 1136 (21S01) at line 25: Column count doesn't match value count at row 1 
+[2026-03-09 12:27:57] FAILED  | tbl_0330 | table=pairing_2 | sql_rows=7394 | db_rows=- | error: ERROR 1136 (21S01) at line 63: Column count doesn't match value count at row 1 
+[2026-03-09 12:27:58] FAILED  | tbl_0331 | table=pairing_3 | sql_rows=4 | db_rows=- | error: ERROR 1136 (21S01) at line 63: Column count doesn't match value count at row 1 
+[2026-03-09 12:28:14] FAILED  | tbl_0333 | table=pairing_composition2 | sql_rows=312896 | db_rows=- | error: ERROR 1136 (21S01) at line 21: Column count doesn't match value count at row 1 
+[2026-03-09 12:28:15] FAILED  | tbl_0334 | table=pairing_composition_3 | sql_rows=24 | db_rows=- | error: ERROR 1136 (21S01) at line 21: Column count doesn't match value count at row 1 

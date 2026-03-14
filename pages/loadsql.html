@@ -1,0 +1,172 @@
+<div class="page-header">
+  <div class="page-title-area">
+    <div class="page-eyebrow">Database Operations</div>
+    <div class="page-title">Load SQL into DB</div>
+    <div class="page-subtitle">Select and execute SQL files from the data load directory into the production database</div>
+  </div>
+</div>
+
+<!-- PASSCODE GATE -->
+<div id="loadsql-gate" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;gap:24px;">
+  <div style="background:var(--surface-2,rgba(255,255,255,0.04));border:1px solid var(--border,rgba(255,255,255,0.08));border-radius:16px;padding:48px 56px;text-align:center;max-width:420px;width:100%;">
+    <div style="font-size:36px;margin-bottom:16px;">🔐</div>
+    <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:600;letter-spacing:2px;color:var(--text-primary,#fff);margin-bottom:8px;">ACCESS RESTRICTED</div>
+    <div style="font-size:12px;color:var(--text-muted,rgba(255,255,255,0.4));letter-spacing:1px;margin-bottom:32px;">ENTER PASSCODE TO CONTINUE</div>
+    <input
+      id="loadsql-passcode"
+      type="password"
+      maxlength="10"
+      placeholder="_ _ _ _"
+      autocomplete="off"
+      style="width:100%;box-sizing:border-box;background:rgba(0,0,0,0.3);border:1px solid var(--border,rgba(255,255,255,0.12));border-radius:8px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:28px;letter-spacing:12px;text-align:center;padding:14px 20px;outline:none;transition:border-color 0.2s;"
+      oninput="loadsqlCheckPasscode()"
+      onkeydown="if(event.key==='Enter')loadsqlSubmitPasscode()"
+    />
+    <div id="loadsql-gate-error" style="height:20px;margin-top:12px;font-size:11px;color:#ff4466;letter-spacing:1px;font-family:'Share Tech Mono',monospace;"></div>
+    <button
+      onclick="loadsqlSubmitPasscode()"
+      style="margin-top:8px;width:100%;padding:12px;background:linear-gradient(135deg,rgba(0,180,255,0.15),rgba(0,100,200,0.15));border:1px solid rgba(0,180,255,0.3);border-radius:8px;color:rgba(0,180,255,0.9);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;letter-spacing:2px;cursor:pointer;transition:all 0.2s;"
+      onmouseover="this.style.background='linear-gradient(135deg,rgba(0,180,255,0.25),rgba(0,100,200,0.25))'"
+      onmouseout="this.style.background='linear-gradient(135deg,rgba(0,180,255,0.15),rgba(0,100,200,0.15))'"
+    >UNLOCK →</button>
+  </div>
+</div>
+
+<!-- MAIN PANEL (hidden until unlocked) -->
+<div id="loadsql-panel" style="display:none;">
+  <div style="display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start;">
+
+    <!-- LEFT: File Browser + Analysis Results -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+
+      <!-- File Browser -->
+      <div style="background:var(--surface-2,rgba(255,255,255,0.04));border:1px solid var(--border,rgba(255,255,255,0.08));border-radius:12px;overflow:hidden;">
+        <div class="panel-header" style="padding:16px 20px;border-bottom:1px solid var(--border,rgba(255,255,255,0.08));display:flex;align-items:center;gap:12px;">
+          <div class="panel-header-icon">📂</div>
+          <div class="panel-title" style="flex:1;">Data Load Directory</div>
+          <button onclick="loadsqlRefreshFiles()" style="background:none;border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:rgba(255,255,255,0.5);font-size:11px;letter-spacing:1px;padding:4px 10px;cursor:pointer;font-family:'Rajdhani',sans-serif;">↻ REFRESH</button>
+        </div>
+        <div style="padding:8px 0;">
+          <div style="padding:4px 20px 8px;font-size:10px;letter-spacing:1.5px;color:rgba(255,255,255,0.3);font-family:'Share Tech Mono',monospace;">
+            /home/eleihu6/rois_tg_live_load/
+          </div>
+          <div id="loadsql-filelist" style="max-height:300px;overflow-y:auto;padding:0 12px 12px;"></div>
+        </div>
+      </div>
+
+      <!-- Analysis Results Table (hidden until analysis starts) -->
+      <div id="loadsql-analysis-panel" style="display:none;background:var(--surface-2,rgba(255,255,255,0.04));border:1px solid var(--border,rgba(255,255,255,0.08));border-radius:12px;overflow:hidden;">
+        <div style="padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <div style="flex:1;font-family:'Rajdhani',sans-serif;font-size:12px;letter-spacing:2px;color:rgba(255,255,255,0.4);">SQL FILE ANALYSIS</div>
+            <div id="loadsql-analysis-progress" style="font-family:'Share Tech Mono',monospace;font-size:10px;color:rgba(0,200,255,0.6);"></div>
+          </div>
+          <div id="loadsql-worker-badges" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+        </div>
+        <!-- Table header -->
+        <div style="display:grid;grid-template-columns:24px minmax(0,1fr) 90px 90px 36px minmax(0,2fr);gap:0;padding:8px 16px;border-bottom:1px solid rgba(255,255,255,0.04);background:rgba(0,0,0,0.2);">
+          <span style="font-size:9px;letter-spacing:1px;color:rgba(255,255,255,0.25);font-family:'Rajdhani',sans-serif;">#</span>
+          <span style="font-size:9px;letter-spacing:1px;color:rgba(255,255,255,0.25);font-family:'Rajdhani',sans-serif;">TABLE NAME</span>
+          <span style="font-size:9px;letter-spacing:1px;color:rgba(255,255,255,0.25);font-family:'Rajdhani',sans-serif;text-align:right;">SQL ROWS</span>
+          <span style="font-size:9px;letter-spacing:1px;color:rgba(255,255,255,0.25);font-family:'Rajdhani',sans-serif;text-align:right;">DB ROWS</span>
+          <span style="font-size:9px;letter-spacing:1px;color:rgba(255,255,255,0.25);font-family:'Rajdhani',sans-serif;text-align:center;">✓</span>
+          <span style="font-size:9px;letter-spacing:1px;color:rgba(255,255,255,0.25);font-family:'Rajdhani',sans-serif;padding-left:10px;">REMARK</span>
+        </div>
+        <div id="loadsql-analysis-body" style="max-height:420px;overflow-y:auto;"></div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Action Panel -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+
+      <!-- DB Info -->
+      <div style="background:var(--surface-2,rgba(255,255,255,0.04));border:1px solid rgba(0,200,100,0.12);border-radius:12px;padding:20px;">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:12px;letter-spacing:2px;color:rgba(255,255,255,0.4);margin-bottom:14px;">TARGET DATABASE</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(0,0,0,0.2);border-radius:6px;border:1px solid rgba(255,255,255,0.06);">
+            <span style="font-size:10px;letter-spacing:1.5px;color:rgba(255,255,255,0.35);font-family:'Rajdhani',sans-serif;">HOST</span>
+            <span style="font-family:'Share Tech Mono',monospace;font-size:12px;color:rgba(0,220,110,0.85);">34.126.181.195</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(0,200,100,0.07);border-radius:6px;border:1px solid rgba(0,200,100,0.2);">
+            <span style="font-size:10px;letter-spacing:1.5px;color:rgba(255,255,255,0.35);font-family:'Rajdhani',sans-serif;">SCHEMA</span>
+            <span style="font-family:'Share Tech Mono',monospace;font-size:12px;color:rgba(0,220,110,1);font-weight:bold;">rois_tg_live_prod</span>
+          </div>
+          <div style="margin-top:4px;display:flex;align-items:center;gap:6px;">
+            <div style="width:7px;height:7px;border-radius:50%;background:rgba(0,220,110,0.9);box-shadow:0 0 6px rgba(0,220,110,0.6);"></div>
+            <span style="font-size:10px;letter-spacing:1px;color:rgba(0,220,110,0.7);font-family:'Rajdhani',sans-serif;">IMPORT TARGET READY</span>
+          </div>
+          <!-- Load Mode Options -->
+          <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px;">
+            <div style="font-size:10px;letter-spacing:1.5px;color:rgba(255,255,255,0.3);font-family:'Rajdhani',sans-serif;margin-bottom:2px;">LOAD MODE</div>
+            <!-- Drop & Reload -->
+            <div onclick="loadsqlSetLoadMode('drop')"
+                 style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;transition:all 0.2s;
+                        background:rgba(255,80,80,0.06);border:1px solid rgba(255,80,80,0.2);"
+                 id="loadsql-mode-drop">
+              <div id="loadsql-mode-drop-toggle"
+                   style="width:30px;height:16px;border-radius:8px;flex-shrink:0;position:relative;transition:all 0.2s;
+                          background:rgba(255,100,100,0.7);border:1px solid rgba(255,80,80,0.5);">
+                <div style="position:absolute;top:2px;left:13px;width:10px;height:10px;border-radius:50%;background:#ff6464;transition:left 0.2s;"></div>
+              </div>
+              <div>
+                <div style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;letter-spacing:1px;color:rgba(255,100,100,0.9);">DROP &amp; RELOAD</div>
+                <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:1px;">Drop existing table then import</div>
+              </div>
+            </div>
+            <!-- Append -->
+            <div onclick="loadsqlSetLoadMode('append')"
+                 style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;transition:all 0.2s;
+                        background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);"
+                 id="loadsql-mode-append">
+              <div id="loadsql-mode-append-toggle"
+                   style="width:30px;height:16px;border-radius:8px;flex-shrink:0;position:relative;transition:all 0.2s;
+                          background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.1);">
+                <div style="position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.5);transition:left 0.2s;"></div>
+              </div>
+              <div>
+                <div style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;letter-spacing:1px;color:rgba(255,255,255,0.4);">APPEND DATA</div>
+                <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:1px;">Keep table, insert rows only</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Selected File Info -->
+      <div style="background:var(--surface-2,rgba(255,255,255,0.04));border:1px solid var(--border,rgba(255,255,255,0.08));border-radius:12px;padding:20px;">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:12px;letter-spacing:2px;color:rgba(255,255,255,0.4);margin-bottom:12px;">SELECTED FILE</div>
+        <div id="loadsql-selected-name" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:rgba(0,200,255,0.9);word-break:break-all;min-height:40px;padding:10px;background:rgba(0,0,0,0.2);border-radius:6px;border:1px solid rgba(0,200,255,0.15);">
+          — none selected —
+        </div>
+        <div id="loadsql-selected-meta" style="margin-top:8px;font-size:11px;color:rgba(255,255,255,0.3);font-family:'Share Tech Mono',monospace;"></div>
+      </div>
+
+      <!-- Step 1: Analyse Button -->
+      <button id="loadsql-analyse-btn" onclick="loadsqlAnalyse()" disabled
+        style="padding:14px 16px;background:linear-gradient(135deg,rgba(120,80,255,0.1),rgba(80,40,200,0.1));border:1px solid rgba(120,80,255,0.2);border-radius:10px;color:rgba(160,120,255,0.5);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:not-allowed;transition:all 0.2s;opacity:0.5;text-align:left;">
+        <span id="loadsql-analyse-btn-text">🔍 &nbsp; STEP 1 — ANALYSE SQL FILE</span>
+      </button>
+
+      <!-- Step 2: Load Button -->
+      <button id="loadsql-load-btn" onclick="loadsqlLoadFile()" disabled
+        style="padding:14px 16px;background:linear-gradient(135deg,rgba(0,200,100,0.1),rgba(0,150,80,0.1));border:1px solid rgba(0,200,100,0.2);border-radius:10px;color:rgba(0,200,100,0.5);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:not-allowed;transition:all 0.2s;opacity:0.5;text-align:left;">
+        ⚡ &nbsp; STEP 2 — LOAD INTO DB
+      </button>
+
+      <!-- To-be-Load Tables -->
+      <div style="background:var(--surface-2,rgba(255,255,255,0.04));border:1px solid var(--border,rgba(255,255,255,0.08));border-radius:12px;overflow:hidden;">
+        <div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <div style="flex:1;font-family:'Rajdhani',sans-serif;font-size:12px;letter-spacing:2px;color:rgba(255,255,255,0.4);">TO-BE-LOAD TABLES</div>
+          <div id="loadsql-match-stats" style="font-family:'Share Tech Mono',monospace;font-size:10px;color:rgba(255,255,255,0.3);"></div>
+          <div id="loadsql-table-count" style="font-family:'Share Tech Mono',monospace;font-size:10px;color:rgba(0,200,255,0.6);"></div>
+          <button onclick="loadsqlRefreshWhitelist()" style="background:none;border:1px solid rgba(255,255,255,0.1);border-radius:5px;color:rgba(255,255,255,0.4);font-size:10px;letter-spacing:1px;padding:3px 8px;cursor:pointer;font-family:'Rajdhani',sans-serif;">↻</button>
+        </div>
+        <div id="loadsql-tablelist" style="font-family:'Share Tech Mono',monospace;font-size:11px;padding:8px;min-height:120px;max-height:300px;overflow-y:auto;color:rgba(255,255,255,0.5);line-height:1.6;">
+          <div style="padding:8px;color:rgba(255,255,255,0.25);">Loading whitelist…</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
