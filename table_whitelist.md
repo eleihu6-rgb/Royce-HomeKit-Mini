@@ -513,10 +513,6 @@ tm_program_pip:Y
 tm_program_rest_pattern:Y
 tm_role:Y
 tm_training_config:Y
-tmp_crew_qualification_01:Y
-tmp_crew_qualification_02:Y
-tmp_crew_qualification_03:Y
-tmp_crew_qualification_04:Y
 tmp_id:Y
 tmp_long_id:Y
 tmp_long_id_session:Y
