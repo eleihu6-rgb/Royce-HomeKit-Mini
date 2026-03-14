@@ -112,7 +112,6 @@ crew:Y
 crew_announcement_record:Y
 crew_attendant:Y
 crew_base:Y
-crew_base_imp:Y
 crew_bidding_allocation:Y
 crew_bidding_approval_result:Y
 crew_bidding_code_points_log:Y
@@ -163,10 +162,8 @@ crew_pay_details:Y
 crew_preference:Y
 crew_profile:Y
 crew_qualification:Y
-crew_qualification_imp:Y
 crew_query_collection:Y
 crew_rank:Y
-crew_rank_imp:Y
 crew_rank_search:Y
 crew_recency_report:Y
 crew_recurrent:Y
@@ -182,7 +179,6 @@ crew_status:Y
 crew_suspension:Y
 crew_swap_block_hour:Y
 crew_team:Y
-crew_team_imp:Y
 crew_training:Y
 crewse-rank-position:Y
 cta_crew_report:Y
