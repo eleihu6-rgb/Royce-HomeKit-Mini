@@ -130,8 +130,6 @@ crew_emquiz:Y
 crew_ensure_blh:Y
 crew_entitlement:Y
 crew_fleet:Y
-crew_fleet_exp:Y
-crew_fleet_imp:Y
 crew_flight_config_date:Y
 crew_flight_config_kpi:Y
 crew_fly_preference:Y
@@ -237,7 +235,6 @@ flight_booking_report_update:Y
 flight_check_point:Y
 flight_composition:Y
 flight_export:Y
-flight_fix_ifid:Y
 flight_import_state:Y
 flight_manifest:Y
 flight_memo:Y
@@ -369,14 +366,12 @@ roster:Y
 roster_acknowledge:Y
 roster_delinac:Y
 roster_export:Y
-roster_f:Y
 roster_flight:Y
 roster_flight_adjust:Y
 roster_flight_export:Y
 roster_flight_memo:Y
 roster_ground:Y
 roster_ground_export:Y
-roster_ground_imp:Y
 roster_ground_memo:Y
 roster_ground_publish:Y
 roster_period:Y
