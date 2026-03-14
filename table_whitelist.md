@@ -59,7 +59,7 @@ assignment_rpt_group_map:Y
 assignment_rule:Y
 assignment_search:Y
 attribute:Y
-audit_login_history:Y
+audit_login_history:N
 auditing_log:Y
 auto_scheduling:Y
 ballot_leave_entitlement:Y
@@ -392,7 +392,6 @@ roster_ver:Y
 route:Y
 route_radiation_config:Y
 rule:Y
-rule_123:Y
 rule_applicability:Y
 rule_param_validation:Y
 rule_parameter:Y
