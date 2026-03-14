@@ -16,8 +16,8 @@ airport_imp:Y
 airport_temp:Y
 airport_zero:Y
 alert_center_mark_config:Y
-alert_handling_log:Y
-alert_message:Y
+alert_handling_log:N
+alert_message:N
 alert_setting:Y
 allowance_exchange_rate:Y
 allowance_rate:Y
@@ -40,9 +40,9 @@ apis_flight:Y
 apis_generate:Y
 apis_generate_crew:Y
 apis_method:Y
-apis_operation_log:Y
+apis_operation_log:N
 apis_record:Y
-apis_resend_record:Y
+apis_resend_record:N
 apis_rule:Y
 apis_rule_detail:Y
 apis_send_record:Y
