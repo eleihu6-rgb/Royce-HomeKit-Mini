@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ROIs Crew — Aviation Intelligence Platform</title>
+<title>ROIs Crew — Ver B3/F6</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@300;400;500;600&family=Bellefair&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
@@ -32,7 +32,7 @@
       <div class="logo-icon">✈</div>
       <div class="logo-text">
         <div class="logo-name">ROIs Crew</div>
-        <div class="logo-tagline">Aviation Intelligence Platform</div>
+        <div class="logo-tagline">Ver: B3/F6</div>
       </div>
     </div>
   </div>
@@ -79,6 +79,13 @@
     <div class="nav-item-inner">
       <div class="nav-icon"><svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12v2H4zM4 9h8v2H4zM4 14h10v2H4z"/><path d="M14 11l4 4-4 4"/></svg></div>
       <div class="nav-label">N-Bids Reformat</div>
+      <div class="nav-badge new">NEW</div>
+    </div>
+  </div>
+  <div class="nav-item" onclick="showPage('crew-bids-summary')">
+    <div class="nav-item-inner">
+      <div class="nav-icon"><svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="16" height="14" rx="2"/><path d="M2 7h16M6 3v4M14 3v4M6 11h2M10 11h2M14 11h2M6 14h2M10 14h2"/></svg></div>
+      <div class="nav-label">Crew Bids Summary</div>
       <div class="nav-badge new">NEW</div>
     </div>
   </div>
@@ -390,6 +397,9 @@
   <!-- ===== N-BIDS REFORMAT PAGE ===== -->
   <div class="page-view" id="page-nbids"></div>
 
+  <!-- ===== CREW BIDS SUMMARY PAGE ===== -->
+  <div class="page-view" id="page-crew-bids-summary"></div>
+
   <!-- ===== DASHBOARD PAGE ===== -->
   <div class="page-view active" id="page-dashboard"></div>
 
@@ -421,6 +431,7 @@
 <script src="js/nav.js"></script>
 <script src="js/dutyswap.js"></script>
 <script src="js/nbids.js"></script>
+<script src="js/crew-bids-summary.js"></script>
 <script src="js/loadsql.js"></script>
 <script src="js/converter.js"></script>
 <script src="js/bids-analysis.js"></script>
@@ -430,21 +441,6 @@
 <script src="js/about-map.js"></script>
 <script src="js/model.js"></script>
 <script src="js/roadmap.js"></script>
-<script>
-// ── Live reload (dev only) ──────────────────────────────────────────────────
-(function () {
-  function connect() {
-    const es = new EventSource('/api/livereload');
-    es.onmessage = function (e) {
-      if (e.data === 'reload') location.reload();
-    };
-    es.onerror = function () {
-      es.close();
-      setTimeout(connect, 2000); // reconnect after 2 s if server restarted
-    };
-  }
-  connect();
-})();
-</script>
+
 </body>
 </html>

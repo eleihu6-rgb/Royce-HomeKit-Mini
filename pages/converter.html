@@ -1,0 +1,176 @@
+    <div class="page-header">
+      <div class="page-title-area">
+        <div class="page-eyebrow">Roster Processing Engine</div>
+        <div class="page-title">PDF → Excel Converter</div>
+        <div class="page-subtitle">Convert Navtech Gantt-style roster PDFs into structured Excel tables with full duty mapping</div>
+      </div>
+    </div>
+
+    <div class="converter-grid">
+      <!-- LEFT: Upload + Files -->
+      <div style="display:flex;flex-direction:column;gap:20px;">
+
+        <!-- Upload Panel -->
+        <div class="upload-panel">
+          <div class="panel-header">
+            <div class="panel-header-icon">📁</div>
+            <div class="panel-title">Upload Roster PDFs</div>
+            <div class="panel-count" id="file-count-label">0 FILES QUEUED</div>
+          </div>
+
+          <div class="upload-zone" id="upload-zone">
+            <input type="file" id="file-input" accept=".pdf" multiple>
+            <span class="upload-icon">📂</span>
+            <div class="upload-title">Drop PDF Roster Files Here</div>
+            <div class="upload-subtitle">
+              Supports Navtech Gantt-style roster format (YVR-737-CA and compatible)<br>
+              Multiple files will be merged into a single Excel output
+            </div>
+            <div class="upload-formats">
+              <span class="format-tag">PDF</span>
+              <span class="format-tag">Navtech</span>
+              <span class="format-tag">YVR-737</span>
+              <span class="format-tag">Multi-File</span>
+            </div>
+          </div>
+
+          <!-- File list -->
+          <div class="file-list" id="file-list">
+            <div class="empty-state visible" id="empty-state">NO FILES QUEUED · DROP PDF FILES TO BEGIN</div>
+          </div>
+
+          <!-- Progress -->
+          <div class="progress-bar-wrap" id="progress-wrap">
+            <div class="progress-bar-fill" id="progress-bar"></div>
+          </div>
+
+          <!-- Convert Button -->
+          <button class="convert-btn" id="convert-btn" onclick="startConversion()" disabled>
+            <span class="spinner" id="spinner"></span>
+            <span id="convert-btn-text">⇄ &nbsp; CONVERT TO EXCEL</span>
+          </button>
+        </div>
+
+        <!-- Processing Log -->
+        <div class="log-panel">
+          <div class="panel-header">
+            <div class="panel-header-icon" style="font-size:10px;">▶</div>
+            <div class="panel-title">Processing Log</div>
+            <div class="panel-count" id="log-count">0 ENTRIES</div>
+          </div>
+          <div class="log-body" id="log-body">
+            <div class="log-entry">
+              <span class="log-time" id="init-time"></span>
+              <span class="log-msg info">System ready · Awaiting roster input</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: Config + Stats + Result -->
+      <div class="config-panel">
+
+        <!-- Conversion Rules -->
+        <div class="config-card">
+          <div class="config-card-header">⚙ Conversion Rules</div>
+          <div class="config-body">
+            <div class="config-row">
+              <span class="config-label">Duty mapping logic</span>
+              <span class="config-value">V1.0</span>
+            </div>
+            <div class="config-row">
+              <span class="config-label">Cross-month lead-in/out</span>
+              <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="config-row">
+              <span class="config-label">Deduplicate duties</span>
+              <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="config-row">
+              <span class="config-label">Include LEAVE crews</span>
+              <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="config-row">
+              <span class="config-label">Row count sheet</span>
+              <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="config-row">
+              <span class="config-label">Output format</span>
+              <span class="config-value">XLSX</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Result card -->
+        <div class="result-card" id="result-card">
+          <div class="result-header">
+            <div class="result-check">✓</div>
+            <div class="result-title">Conversion Complete</div>
+          </div>
+          <div class="result-body">
+            <div class="result-stats">
+              <div class="result-stat">
+                <div class="result-stat-val" id="res-files">—</div>
+                <div class="result-stat-lbl">Files</div>
+              </div>
+              <div class="result-stat">
+                <div class="result-stat-val" id="res-crews">—</div>
+                <div class="result-stat-lbl">Crews</div>
+              </div>
+              <div class="result-stat">
+                <div class="result-stat-val" id="res-pdf-rows">—</div>
+                <div class="result-stat-lbl">PDF Rows</div>
+              </div>
+              <div class="result-stat">
+                <div class="result-stat-val" id="res-excel-rows">—</div>
+                <div class="result-stat-lbl">Excel Rows</div>
+              </div>
+            </div>
+            <button class="download-btn" onclick="downloadExcel()">
+              ⬇ &nbsp; DOWNLOAD EXCEL
+            </button>
+          </div>
+        </div>
+
+        <!-- Assignment Legend -->
+        <div class="config-card">
+          <div class="config-card-header">◎ Assignment Legend</div>
+          <div class="config-body" style="padding:12px 20px;">
+            <div class="config-row">
+              <span class="config-label">FLY</span>
+              <span class="config-value" style="border-color:rgba(0,200,255,0.5)">FLIGHT DUTY</span>
+            </div>
+            <div class="config-row">
+              <span class="config-label">FLYXX</span>
+              <span class="config-value" style="border-color:rgba(0,200,255,0.3)">DEADHEAD</span>
+            </div>
+            <div class="config-row">
+              <span class="config-label">SIM</span>
+              <span class="config-value">SIMULATOR</span>
+            </div>
+            <div class="config-row">
+              <span class="config-label">VGDO / TGDO</span>
+              <span class="config-value">DAY OFF</span>
+            </div>
+            <div class="config-row">
+              <span class="config-label">VAC</span>
+              <span class="config-value">VACATION</span>
+            </div>
+            <div class="config-row">
+              <span class="config-label">PRPM / PRAM</span>
+              <span class="config-value">TRAINING</span>
+            </div>
+            <div class="config-row">
+              <span class="config-label">COD / CRM / CBT</span>
+              <span class="config-value">GROUND DUTY</span>
+            </div>
+            <div class="config-row" style="border-bottom:none">
+              <span class="config-label">LEAVE</span>
+              <span class="config-value">FULL LEAVE</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>

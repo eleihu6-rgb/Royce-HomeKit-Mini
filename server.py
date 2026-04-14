@@ -4,7 +4,7 @@ NAVOPS — PDF Roster Parser Backend
 Run: python3 server.py
 Serves the HTML on :8080 and the parse API on POST /api/convert
 """
-import http.server, json, os, re, io, traceback, subprocess, threading, uuid, time, base64, queue
+import http.server, json, os, re, io, traceback, subprocess, threading, uuid, time, base64, datetime
 import concurrent.futures
 from collections import defaultdict
 from urllib.parse import urlparse, parse_qs
@@ -12,66 +12,6 @@ from urllib.parse import urlparse, parse_qs
 ANALYSE_WORKERS = 4
 TABLE_LIMIT     = 50
 
-# ─── Live-reload file watcher ────────────────────────────────────────────────
-_lr_clients  = set()   # set of queue.Queue, one per connected browser tab
-_lr_lock     = threading.Lock()
-
-def _lr_broadcast():
-    with _lr_lock:
-        for q in list(_lr_clients):
-            try:
-                q.put_nowait('reload')
-            except queue.Full:
-                pass
-
-def _lr_watch():
-    """Poll UI files every 400 ms; broadcast 'reload' on any mtime change."""
-    BASE = os.path.dirname(os.path.abspath(__file__))
-    patterns = [
-        [BASE],                                          # *.html at root
-        [BASE, 'css'],                                   # css/*.css
-        [BASE, 'js'],                                    # js/*.js
-        [BASE, 'pages'],                                 # pages/*.html
-    ]
-    exts = {'.html', '.css', '.js'}
-    mtimes = {}
-
-    def collect():
-        for parts in patterns:
-            d = os.path.join(*parts)
-            if not os.path.isdir(d):
-                continue
-            for fname in os.listdir(d):
-                if os.path.splitext(fname)[1] in exts:
-                    fp = os.path.join(d, fname)
-                    try:
-                        mtimes[fp] = os.stat(fp).st_mtime
-                    except OSError:
-                        pass
-
-    collect()
-    while True:
-        time.sleep(0.4)
-        changed = False
-        for parts in patterns:
-            d = os.path.join(*parts)
-            if not os.path.isdir(d):
-                continue
-            for fname in os.listdir(d):
-                if os.path.splitext(fname)[1] not in exts:
-                    continue
-                fp = os.path.join(d, fname)
-                try:
-                    mt = os.stat(fp).st_mtime
-                except OSError:
-                    continue
-                if mtimes.get(fp) != mt:
-                    mtimes[fp] = mt
-                    changed = True
-        if changed:
-            _lr_broadcast()
-
-threading.Thread(target=_lr_watch, daemon=True, name='livereload-watcher').start()
 
 # ─── Background job store ───────────────────────────────────────────────────────
 _jobs = {}   # job_id -> {'status': 'running'|'done'|'error', 'tables': [], 'progress': N, 'error': str}
@@ -373,9 +313,6 @@ class Handler(http.server.BaseHTTPRequestHandler):
 
     def do_GET(self):
         path = urlparse(self.path).path
-        if path == '/api/livereload':
-            self.handle_livereload()
-            return
         if path == '/api/sql-files':
             self.handle_sql_files()
             return
@@ -404,6 +341,10 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.handle_whitelist_toggle()
         elif self.path == '/api/nbids-reformat':
             self.handle_nbids_reformat()
+        elif self.path == '/api/crew-bids-summary':
+            self.handle_crew_bids_summary()
+        elif self.path == '/api/roster-report':
+            self.handle_roster_report()
         else:
             self.send_error(404)
 
@@ -412,33 +353,10 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self._cors()
         self.end_headers()
 
-    def handle_livereload(self):
-        """Server-Sent Events endpoint. Keeps connection open; sends 'reload' on file change."""
-        self.send_response(200)
-        self.send_header('Content-Type', 'text/event-stream')
-        self.send_header('Cache-Control', 'no-cache')
-        self.send_header('X-Accel-Buffering', 'no')
-        self._cors()
-        self.end_headers()
-        q = queue.Queue(maxsize=4)
-        with _lr_lock:
-            _lr_clients.add(q)
-        try:
-            # Send an initial ping so the browser knows the connection is live
-            self.wfile.write(b': connected\n\n')
-            self.wfile.flush()
-            while True:
-                try:
-                    msg = q.get(timeout=15)      # 15-s heartbeat
-                    self.wfile.write(f'data: {msg}\n\n'.encode())
-                except queue.Empty:
-                    self.wfile.write(b': ping\n\n')  # keep-alive comment
-                self.wfile.flush()
-        except (BrokenPipeError, ConnectionResetError):
-            pass
-        finally:
-            with _lr_lock:
-                _lr_clients.discard(q)
+    def _is_public_tunnel(self):
+        """Return True when accessed through a Cloudflare tunnel (not localhost)."""
+        host = self.headers.get('Host', '')
+        return not host.startswith('localhost') and not host.startswith('127.')
 
     def _cors(self):
         self.send_header('Access-Control-Allow-Origin', '*')
@@ -938,6 +856,83 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(err)
 
+    def handle_roster_report(self):
+        try:
+            content_type = self.headers.get('Content-Type', '')
+            length = int(self.headers.get('Content-Length', 0))
+            body   = self.rfile.read(length)
+
+            results = []
+            if 'multipart/form-data' in content_type:
+                boundary = content_type.split('boundary=')[-1].encode()
+                parts = body.split(b'--' + boundary)
+                for part in parts:
+                    if (b'name="file"' in part or b'name="files"' in part) and b'filename=' in part:
+                        hend = part.find(b'\r\n\r\n')
+                        if hend != -1:
+                            txt = part[hend+4:].rstrip(b'\r\n--').decode('utf-8', errors='replace')
+                            results.append(parse_roster_report(txt))
+            else:
+                results.append(parse_roster_report(body.decode('utf-8', errors='replace')))
+
+            if not results:
+                raise ValueError('No file content received')
+
+            payload = json.dumps(results).encode()
+            self.send_response(200)
+            self._cors()
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', len(payload))
+            self.end_headers()
+            self.wfile.write(payload)
+        except Exception as e:
+            err = json.dumps({'error': str(e), 'trace': traceback.format_exc()}).encode()
+            self.send_response(500)
+            self._cors()
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', len(err))
+            self.end_headers()
+            self.wfile.write(err)
+
+    def handle_crew_bids_summary(self):
+        try:
+            content_type = self.headers.get('Content-Type', '')
+            length = int(self.headers.get('Content-Length', 0))
+            body   = self.rfile.read(length)
+
+            txt_content = None
+            if 'multipart/form-data' in content_type:
+                boundary = content_type.split('boundary=')[-1].encode()
+                parts = body.split(b'--' + boundary)
+                for part in parts:
+                    if b'name="file"' in part and b'filename=' in part:
+                        hend = part.find(b'\r\n\r\n')
+                        if hend != -1:
+                            txt_content = part[hend+4:].rstrip(b'\r\n--').decode('utf-8', errors='replace')
+                            break
+            else:
+                txt_content = body.decode('utf-8', errors='replace')
+
+            if not txt_content:
+                raise ValueError('No file content received')
+
+            result = parse_crew_bids_summary(txt_content)
+            payload = json.dumps(result).encode()
+            self.send_response(200)
+            self._cors()
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', len(payload))
+            self.end_headers()
+            self.wfile.write(payload)
+        except Exception as e:
+            err = json.dumps({'error': str(e), 'trace': traceback.format_exc()}).encode()
+            self.send_response(500)
+            self._cors()
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', len(err))
+            self.end_headers()
+            self.wfile.write(err)
+
     def serve_file(self, path):
         ext = os.path.splitext(path)[1].lower()
         mime = {'.html':'text/html','.js':'application/javascript',
@@ -1414,6 +1409,356 @@ def nb_parse_txt(txt_content, period):
             i += 1
 
     return output_rows, error_rows, {'input_rows': input_rows, 'groups': group_id}
+
+# ─── Crew Bids Summary Parser ────────────────────────────────────────────────
+
+def parse_crew_bids_summary(txt_content):
+    """Parse a CLASS bids TXT file and return per-category summary data.
+
+    Returns:
+        {
+          'bid_month': 'Mar 2026',
+          'days_in_month': 31,
+          'categories': [{'name': 'YEG-737-FO', 'total_crew': 10}, ...],
+          'summary': {
+              'YEG-737-FO': {
+                  'total_crew': 10,
+                  'do_bids': {'1': 3, '5': 7, ...}   # day -> count
+              }, ...
+          }
+        }
+
+    Rules:
+    - total_crew = distinct Employee # for that category (all bid types)
+    - do_bids counts crew who have 'Prefer Off <specific date>' in bid group 1
+      of their Current Bid.  Day-name-only lines (e.g. 'Prefer Off Weekends')
+      are NOT date-specific and do NOT count.
+    - Only bid group 1 (before first block separator inside Bid Preferences).
+    """
+    import calendar as _cal
+
+    CREW_DASH_RE  = re.compile(r'^-{10,}\s*$')
+    BLOCK_DASH_RE = re.compile(r'^\s+-{3,}\s*$')
+    EMP_RE        = re.compile(r'Employee\s*#\s+(\d+)', re.I)
+    CAT_RE        = re.compile(r'Category\s+([\w-]+)', re.I)
+    BIDTYPE_RE    = re.compile(r'\b(Default|Current)\s+Bid\b', re.I)
+    ITEM_RE       = re.compile(r'^\s{1,10}\d+\.\s+(.+)$')
+    # Matches specific calendar dates: "Mar 27, 2026"
+    SPEC_DATE_RE  = re.compile(
+        r'\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{1,2}),\s+(\d{4})\b', re.I)
+    PREFER_OFF_RE = re.compile(r'^Prefer\s+Off\b', re.I)
+
+    # --- detect period ---
+    period = _nb_detect_period(txt_content)
+    parts  = period.split()
+    MONTHS = {'Jan':1,'Feb':2,'Mar':3,'Apr':4,'May':5,'Jun':6,
+              'Jul':7,'Aug':8,'Sep':9,'Oct':10,'Nov':11,'Dec':12}
+    bid_mon_num = MONTHS.get(parts[0][:3].capitalize(), 1) if parts else 1
+    bid_year    = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else 2026
+    days_in_month = _cal.monthrange(bid_year, bid_mon_num)[1]
+
+    # --- per-category accumulators ---
+    cat_all_crew   = {}   # category -> set of emp_ids (all bid types)
+    cat_do_bids    = {}   # category -> {day_int -> set of emp_ids}
+
+    lines   = txt_content.splitlines()
+    n       = len(lines)
+    i       = 0
+
+    while i < n:
+        # Wait for a top-level separator
+        if not CREW_DASH_RE.match(lines[i].rstrip()):
+            i += 1
+            continue
+
+        # Skip blank lines after separator
+        i += 1
+        while i < n and not lines[i].strip():
+            i += 1
+        if i >= n:
+            break
+
+        # Parse crew header line
+        header_line = lines[i]
+        emp_m = EMP_RE.search(header_line)
+        if not emp_m:
+            i += 1
+            continue
+
+        emp_id   = emp_m.group(1).lstrip('0') or '0'
+        cat_m    = CAT_RE.search(header_line)
+        category = cat_m.group(1) if cat_m else 'Unknown'
+
+        # Bid type on the next line
+        i += 1
+        bid_type = 'Default'
+        if i < n:
+            bm = BIDTYPE_RE.search(lines[i])
+            if bm:
+                bid_type = bm.group(1).capitalize()
+            i += 1
+
+        # Accumulate total crew (regardless of bid type)
+        if category not in cat_all_crew:
+            cat_all_crew[category] = set()
+        cat_all_crew[category].add(emp_id)
+
+        # Skip ahead to "Bid Preferences:"
+        # Note: there is a second CREW_DASH closing the header block — skip it.
+        while i < n:
+            raw = lines[i].rstrip()
+            if CREW_DASH_RE.match(raw):
+                # Could be the header-closing dash — skip it and keep looking
+                i += 1
+                continue
+            if 'Bid Preferences:' in lines[i]:
+                i += 1
+                break
+            i += 1
+        else:
+            continue
+
+        # We're now inside Bid Preferences.
+        # Scan bid group 1 (lines until first BLOCK_DASH_RE after we enter).
+        # A BLOCK_DASH_RE opens group 1; another closes it.
+        # If bid_type != 'Current', skip content but still advance i.
+
+        # Skip to first block dash (opens group 1)
+        while i < n:
+            raw = lines[i].rstrip()
+            if CREW_DASH_RE.match(raw):
+                break
+            if BLOCK_DASH_RE.match(raw):
+                i += 1
+                break
+            i += 1
+
+        # Collect bid group 1 items
+        bg1_items = []
+        while i < n:
+            raw = lines[i].rstrip()
+            if CREW_DASH_RE.match(raw):
+                break
+            if BLOCK_DASH_RE.match(raw):
+                i += 1
+                break  # end of bid group 1
+            item_m = ITEM_RE.match(raw)
+            if item_m:
+                bg1_items.append(item_m.group(1).strip())
+            i += 1
+
+        # Skip rest of this crew block (bid groups 2+)
+        while i < n:
+            raw = lines[i].rstrip()
+            if CREW_DASH_RE.match(raw):
+                break
+            i += 1
+
+        # Only Current Bid contributes to DO BIDS
+        if bid_type != 'Current':
+            continue
+
+        # Extract "Prefer Off" with specific dates
+        for item in bg1_items:
+            if not PREFER_OFF_RE.match(item):
+                continue
+            dates = SPEC_DATE_RE.findall(item)
+            if not dates:
+                continue  # day-name-only, skip
+            if category not in cat_do_bids:
+                cat_do_bids[category] = {}
+            for mon_abbr, day_str, yr_str in dates:
+                mon_num = MONTHS.get(mon_abbr[:3].capitalize())
+                if mon_num != bid_mon_num:
+                    continue  # outside the bid month
+                day_int = int(day_str)
+                if day_int not in cat_do_bids[category]:
+                    cat_do_bids[category][day_int] = set()
+                cat_do_bids[category][day_int].add(emp_id)
+
+    # Build output — sort categories alphabetically
+    all_cats = sorted(cat_all_crew.keys())
+    categories_list = [
+        {'name': c, 'total_crew': len(cat_all_crew[c])}
+        for c in all_cats
+    ]
+    summary = {}
+    for c in all_cats:
+        do_bids_raw = cat_do_bids.get(c, {})
+        summary[c] = {
+            'total_crew': len(cat_all_crew[c]),
+            'do_bids': {str(d): len(emp_set) for d, emp_set in sorted(do_bids_raw.items())},
+            'do_bids_crew': {str(d): sorted(emp_set, key=lambda x: int(x))
+                             for d, emp_set in sorted(do_bids_raw.items())},
+        }
+
+    return {
+        'bid_month':     period,
+        'days_in_month': days_in_month,
+        'categories':    categories_list,
+        'summary':       summary,
+    }
+
+
+# ─── Roster Report Parser ─────────────────────────────────────────────────────
+
+def parse_roster_report(txt_content):
+    """Parse a CLASS roster report TXT and return DO PRE-ASSIN data.
+
+    DO PRE-ASSIN counts crew who have Historical+GDO or Pre-Award+VGDO on a date.
+    Multi-day activities are expanded across all covered calendar days within the
+    bid month.  End time "00:00" means the activity ends at midnight (exclusive),
+    so the end date itself is NOT counted.
+
+    Returns:
+        {
+          'category':     'YEG-737-FO',
+          'period':       'Mar 2026',
+          'days_in_month': 31,
+          'do_pre_assin': { '1': ['1475', '1806', ...], '3': [...], ... }
+        }
+    """
+    import calendar as _cal
+
+    lines = txt_content.splitlines()
+
+    # ── Detect period ──────────────────────────────────────────────────────────
+    period = _nb_detect_period(txt_content)
+    parts  = period.split()
+    MONTHS = {'Jan':1,'Feb':2,'Mar':3,'Apr':4,'May':5,'Jun':6,
+              'Jul':7,'Aug':8,'Sep':9,'Oct':10,'Nov':11,'Dec':12}
+    bid_mon_num   = MONTHS.get(parts[0][:3].capitalize(), 1) if parts else 1
+    bid_year      = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else 2026
+    days_in_month = _cal.monthrange(bid_year, bid_mon_num)[1]
+
+    # ── Detect category ────────────────────────────────────────────────────────
+    category = 'Unknown'
+    for line in lines[:15]:
+        m = re.match(r'^\s*Category\s*:\s*(.+)', line, re.I)
+        if m:
+            category = m.group(1).strip()
+            break
+
+    SEP_RE = re.compile(r'^-{30,}\s*$')
+
+    # ── Accumulate per-day crew sets ───────────────────────────────────────────
+    do_pre_assin = {}   # day_int -> set of emp_id strings
+    all_crew     = set()  # all valid employee IDs in this roster
+
+    i = 0
+    n = len(lines)
+
+    while i < n:
+        raw = lines[i].rstrip()
+        if not SEP_RE.match(raw):
+            i += 1
+            continue
+
+        # After separator: skip blanks, read crew header
+        i += 1
+        while i < n and not lines[i].strip():
+            i += 1
+        if i >= n:
+            break
+
+        header_line = lines[i].strip()
+
+        # Stop at end-of-file marker
+        if header_line.startswith('End of Roster Report'):
+            break
+
+        # Skip column-header line
+        if header_line.startswith('EmployeeId'):
+            i += 1
+            continue
+
+        tokens = header_line.split()
+        if not tokens:
+            i += 1
+            continue
+
+        emp_id = tokens[0]
+
+        # Skip open positions and non-employee rows
+        if emp_id.startswith('Open') or not re.match(r'^\d+$', emp_id):
+            i += 1
+            while i < n and not SEP_RE.match(lines[i].rstrip()):
+                i += 1
+            continue
+
+        i += 1  # past header line
+        all_crew.add(emp_id)
+
+        # Skip the closing separator of the header block
+        while i < n:
+            if SEP_RE.match(lines[i].rstrip()):
+                i += 1
+                break
+            i += 1
+
+        # Parse activity lines until the next top-level separator
+        while i < n:
+            raw = lines[i].rstrip()
+            if SEP_RE.match(raw):
+                break
+
+            stripped = raw.strip()
+            if not stripped:
+                i += 1
+                continue
+
+            tokens = stripped.split()
+            if len(tokens) < 6:
+                i += 1
+                continue
+
+            result, activity = tokens[0], tokens[1]
+
+            is_qualifying = (
+                (result == 'Historical' and activity == 'GDO') or
+                (result == 'Pre-Award'  and activity == 'VGDO')
+            )
+
+            if is_qualifying:
+                try:
+                    # Date format in file: DayName,YYYY-MM-DD  e.g. Sun,2026-03-01
+                    start_date_str = tokens[2].split(',')[-1]
+                    end_date_str   = tokens[4].split(',')[-1]
+                    end_time       = tokens[5]
+
+                    start_d = datetime.date.fromisoformat(start_date_str)
+                    end_d   = datetime.date.fromisoformat(end_date_str)
+
+                    # End time "00:00" means the activity ends at midnight:
+                    # the end date itself is the first moment of that day → not covered.
+                    if end_time == '00:00':
+                        end_d -= datetime.timedelta(days=1)
+
+                    # Expand across all covered days within the bid month
+                    cur = start_d
+                    while cur <= end_d:
+                        if cur.year == bid_year and cur.month == bid_mon_num:
+                            d = cur.day
+                            if d not in do_pre_assin:
+                                do_pre_assin[d] = set()
+                            do_pre_assin[d].add(emp_id)
+                        cur += datetime.timedelta(days=1)
+                except (IndexError, ValueError):
+                    pass
+
+            i += 1
+
+    return {
+        'category':      category,
+        'period':        period,
+        'days_in_month': days_in_month,
+        'total_crew':    len(all_crew),
+        'do_pre_assin':  {
+            str(d): sorted(s, key=lambda x: int(x) if x.isdigit() else 0)
+            for d, s in sorted(do_pre_assin.items())
+        },
+    }
+
 
 if __name__ == '__main__':
     PORT = 8088

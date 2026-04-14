@@ -68,21 +68,32 @@ function removeFile(idx) {
   document.getElementById('result-card').classList.remove('visible');
 }
 
-// File input
-document.getElementById('file-input').addEventListener('change', function(e) {
-  handleFiles(Array.from(e.target.files));
-  this.value = '';
-});
+function initConverterPage() {
+  // File input
+  const fileInput = document.getElementById('file-input');
+  if (fileInput) {
+    fileInput.addEventListener('change', function(e) {
+      handleFiles(Array.from(e.target.files));
+      this.value = '';
+    });
+  }
 
-// Drag and drop
-const zone = document.getElementById('upload-zone');
-zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
-zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-zone.addEventListener('drop', e => {
-  e.preventDefault();
-  zone.classList.remove('drag-over');
-  handleFiles(Array.from(e.dataTransfer.files).filter(f => f.type === 'application/pdf'));
-});
+  // Drag and drop
+  const zone = document.getElementById('upload-zone');
+  if (zone) {
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      handleFiles(Array.from(e.dataTransfer.files).filter(f => f.type === 'application/pdf'));
+    });
+  }
+
+  // Reset init-time display
+  const initTimeEl = document.getElementById('init-time');
+  if (initTimeEl) initTimeEl.textContent = new Date().toUTCString().split(' ')[4];
+}
 
 function handleFiles(newFiles) {
   if (!newFiles.length) return;

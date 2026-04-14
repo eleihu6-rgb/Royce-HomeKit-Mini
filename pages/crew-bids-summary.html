@@ -1,0 +1,193 @@
+    <style>
+      /* ── CBS report table ────────────────────────────────────────────── */
+      .cbs-cat-section { margin-bottom: 32px; }
+      .cbs-cat-hdr {
+        font-family:'Rajdhani',sans-serif; font-size:15px; font-weight:600;
+        color:var(--accent-primary); letter-spacing:1px;
+        border-left:3px solid var(--accent-primary);
+        padding:6px 12px; margin-bottom:10px;
+        background:rgba(0,212,255,0.05); border-radius:0 6px 6px 0;
+      }
+      .cbs-cat-wrap { overflow-x: auto; }
+      .cbs-cat-table {
+        border-collapse:collapse; font-family:'Share Tech Mono',monospace;
+        font-size:11px; width:100%; min-width:max-content;
+      }
+      .cbs-th {
+        padding:7px 10px; text-align:center;
+        border:1px solid var(--border-dim);
+        background:var(--bg-elevated);
+        color:var(--text-secondary); font-size:10px;
+        white-space:nowrap; letter-spacing:0.5px;
+        position:sticky; top:0; min-width:52px;
+      }
+      .cbs-th.cbs-th-label {
+        padding:7px 14px; text-align:left;
+        min-width:180px; left:0; z-index:2;
+      }
+      .cbs-td {
+        padding:5px 10px; text-align:center;
+        border:1px solid var(--border-dim);
+        color:var(--text-secondary); white-space:nowrap;
+      }
+      .cbs-td.cbs-td-label {
+        padding:5px 14px; text-align:left; font-weight:500;
+        color:var(--text-primary);
+        position:sticky; left:0; background:var(--bg-card); z-index:1;
+      }
+      .cbs-td-alt { background:rgba(255,255,255,0.02); }
+      .cbs-td-data { color:var(--accent-primary); font-weight:600; }
+      .cbs-td-val  { color:var(--text-primary); font-weight:600; }
+      .cbs-td-tip  { cursor:pointer; text-decoration:underline dotted; }
+    </style>
+
+    <div class="page-header">
+      <div class="page-title-area">
+        <div class="page-eyebrow">Crew Scheduling Tools</div>
+        <div class="page-title">Crew Bids Summary</div>
+        <div class="page-subtitle">Upload bid + roster TXT files together and analyse crew days-off bids by category and date</div>
+      </div>
+    </div>
+
+    <div class="converter-grid">
+
+      <!-- LEFT: Upload + Log -->
+      <div style="display:flex;flex-direction:column;gap:20px;">
+
+        <!-- Upload Panel -->
+        <div class="upload-panel">
+          <div class="panel-header">
+            <div class="panel-header-icon">📄</div>
+            <div class="panel-title">Upload TXT Files</div>
+          </div>
+
+          <!-- Drop zone -->
+          <div class="upload-zone" id="cbs-upload-zone">
+            <input type="file" id="cbs-file-input" accept=".txt" multiple style="display:none;">
+            <input type="file" id="cbs-folder-input" webkitdirectory mozdirectory accept=".txt" style="display:none;">
+            <span class="upload-icon">📂</span>
+            <div class="upload-title">Drop TXT Files Here</div>
+            <div class="upload-subtitle">
+              Drag &amp; drop bid report + roster TXT files together, or use the buttons below
+            </div>
+            <div class="upload-formats">
+              <span class="format-tag">BID REPORT</span>
+              <span class="format-tag">ROSTER</span>
+              <span class="format-tag">DRAG &amp; DROP</span>
+            </div>
+          </div>
+
+          <!-- Browse buttons row -->
+          <div style="display:flex;gap:10px;padding:10px 0 4px;">
+            <button class="convert-btn" onclick="document.getElementById('cbs-file-input').click()"
+              style="flex:1;padding:8px 10px;font-size:11px;background:var(--bg-elevated);">
+              📄 &nbsp; SELECT FILE
+            </button>
+            <button class="convert-btn" onclick="document.getElementById('cbs-folder-input').click()"
+              style="flex:1;padding:8px 10px;font-size:11px;background:var(--bg-elevated);">
+              📁 &nbsp; BROWSE FOLDER
+            </button>
+          </div>
+
+          <!-- Selected file display -->
+          <div class="file-list" id="cbs-file-display" style="display:none;">
+            <div id="cbs-file-name"
+              style="font-family:'Share Tech Mono',monospace;font-size:12px;
+                     color:var(--text-primary);padding:8px 16px;line-height:1.8;"></div>
+          </div>
+
+          <!-- Folder TXT picker (shown after folder selected) -->
+          <div id="cbs-folder-picker" style="display:none;margin-top:8px;">
+            <div style="font-family:'Inter',sans-serif;font-size:11px;
+                        color:var(--text-secondary);padding:4px 4px 6px;letter-spacing:0.5px;">
+              TXT FILES IN FOLDER — click to select:
+            </div>
+            <div id="cbs-folder-list"
+              style="max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;">
+            </div>
+          </div>
+
+          <button class="convert-btn" id="cbs-analyse-btn" onclick="cbsAnalyse()" disabled
+            style="margin-top:10px;">
+            <span class="spinner" id="cbs-spinner"></span>
+            <span id="cbs-btn-text">⇄ &nbsp; ANALYSE FILE</span>
+          </button>
+        </div>
+
+        <!-- Log Panel -->
+        <div class="log-panel">
+          <div class="panel-header">
+            <div class="panel-header-icon" style="font-size:10px;">▶</div>
+            <div class="panel-title">Processing Log</div>
+            <div class="panel-count" id="cbs-log-count">0 ENTRIES</div>
+          </div>
+          <div class="log-body" id="cbs-log-body">
+            <div class="log-entry">
+              <span class="log-msg info">Ready · Select bid + roster TXT files, or browse a folder</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: Quick Analysis + Category Selector -->
+      <div class="config-panel">
+
+        <!-- Quick Analysis -->
+        <div class="config-card" id="cbs-analysis-card" style="display:none;">
+          <div class="config-card-header">◎ Quick Analysis</div>
+          <div class="config-body">
+            <div class="config-row">
+              <span class="config-label">Bid Month</span>
+              <span class="config-value" id="cbs-bid-month">—</span>
+            </div>
+            <div class="config-row" style="border-bottom:none;">
+              <span class="config-label">Crew Categories</span>
+              <span class="config-value" id="cbs-cat-count">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category List -->
+        <div class="config-card" id="cbs-category-card" style="display:none;">
+          <div class="config-card-header">◎ Categories Found</div>
+          <div class="config-body" id="cbs-category-body"
+            style="padding:12px 16px;gap:6px;display:flex;flex-direction:column;">
+          </div>
+        </div>
+
+        <!-- Generate Button -->
+        <div id="cbs-generate-wrap" style="display:none;padding:0;">
+          <div style="padding:0 4px;">
+            <div style="margin-bottom:10px;display:flex;gap:8px;">
+              <button class="convert-btn" id="cbs-all-btn"
+                style="flex:1;padding:8px 12px;font-size:11px;"
+                onclick="cbsSelectAll()">SELECT ALL</button>
+              <button class="convert-btn" id="cbs-none-btn"
+                style="flex:1;padding:8px 12px;font-size:11px;background:var(--bg-elevated);"
+                onclick="cbsSelectNone()">CLEAR</button>
+            </div>
+            <button class="convert-btn" id="cbs-report-btn" onclick="cbsGenerate()">
+              ▶ &nbsp; GENERATE SUMMARY REPORT
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Summary Report (full width) -->
+    <div id="cbs-report-section" style="display:none;margin-top:28px;">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:600;
+                    color:var(--text-primary);letter-spacing:1px;">
+          CREW BIDS SUMMARY REPORT
+        </div>
+        <div id="cbs-report-month"
+          style="font-family:'Share Tech Mono',monospace;font-size:12px;
+                 color:var(--accent-primary);background:rgba(0,212,255,0.08);
+                 border:1px solid rgba(0,212,255,0.25);border-radius:6px;padding:3px 10px;">
+        </div>
+      </div>
+      <div id="cbs-tables-wrap"></div>
+    </div>
