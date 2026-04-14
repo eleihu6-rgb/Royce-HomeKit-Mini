@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ROIs Crew — Aviation Intelligence Platform</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@300;400;500;600&family=Bellefair&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
 <link rel="stylesheet" href="css/core.css">
@@ -44,7 +44,7 @@
 
   <div class="sidebar-section-label">Navigation</div>
 
-  <div class="nav-item" onclick="showPage('dashboard')">
+  <div class="nav-item active" onclick="showPage('dashboard')">
     <div class="nav-item-inner">
       <div class="nav-icon"><svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="4" rx="1.5"/><rect x="2" y="11" width="7" height="4" rx="1.5"/><rect x="11" y="8" width="7" height="7" rx="1.5"/></svg></div>
       <div class="nav-label">Dashboard</div>
@@ -61,7 +61,7 @@
     </div>
   </div>
 
-  <div class="nav-item active" onclick="showPage('converter')">
+  <div class="nav-item" onclick="showPage('converter')">
     <div class="nav-item-inner">
       <div class="nav-icon"><svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h12M16 7l-3-3M16 7l-3 3"/><path d="M16 13H4M4 13l3-3M4 13l3 3"/></svg></div>
       <div class="nav-label">PDF → Excel Converter</div>
@@ -72,6 +72,14 @@
     <div class="nav-item-inner">
       <div class="nav-icon"><svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="10" cy="5" rx="7" ry="3"/><path d="M3 5v4c0 1.7 3.1 3 7 3s7-1.3 7-3V5"/><path d="M3 9v4c0 1.7 3.1 3 7 3s7-1.3 7-3V9"/></svg></div>
       <div class="nav-label">Load SQL into DB</div>
+    </div>
+  </div>
+
+  <div class="nav-item" onclick="showPage('nbids')">
+    <div class="nav-item-inner">
+      <div class="nav-icon"><svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12v2H4zM4 9h8v2H4zM4 14h10v2H4z"/><path d="M14 11l4 4-4 4"/></svg></div>
+      <div class="nav-label">N-Bids Reformat</div>
+      <div class="nav-badge new">NEW</div>
     </div>
   </div>
 
@@ -145,6 +153,22 @@
     </div>
   </div>
 
+  <div class="nav-item" onclick="showPage('dutyswap')">
+    <div class="nav-item-inner">
+      <div class="nav-icon"><svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h10M5 8l-3 4h16l-3-4M8 12v4M12 12v4M6 16h8"/></svg></div>
+      <div class="nav-label">Duty Swap</div>
+      <div class="nav-badge new">NEW</div>
+    </div>
+  </div>
+
+  <div class="nav-item" onclick="showPage('dutyswap2')">
+    <div class="nav-item-inner">
+      <div class="nav-icon"><svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h12M4 13h12M7 4l-3 3 3 3M13 10l3 3-3 3"/></svg></div>
+      <div class="nav-label">Duty Swap II</div>
+      <div class="nav-badge new">NEW</div>
+    </div>
+  </div>
+
 
   <div class="sidebar-footer">
     <div class="sidebar-footer-info">
@@ -166,7 +190,7 @@
     <div class="topbar-breadcrumb">
       <span>ROIs Crew</span>
       <span class="sep">/</span>
-      <span id="breadcrumb-current" class="current">PDF → EXCEL CONVERTER</span>
+      <span id="breadcrumb-current" class="current">DASHBOARD</span>
     </div>
     <div class="topbar-right">
       <div class="topbar-clock" id="clock">--:--:-- UTC</div>
@@ -178,7 +202,7 @@
   </div>
 
   <!-- ===== CONVERTER PAGE ===== -->
-  <div class="page-view active" id="page-converter">
+  <div class="page-view" id="page-converter">
     <div class="page-header">
       <div class="page-title-area">
         <div class="page-eyebrow">Roster Processing Engine</div>
@@ -363,8 +387,11 @@
   <!-- ===== BIDS TYPE ANALYSIS PAGE ===== -->
   <div class="page-view" id="page-bids"></div>
 
+  <!-- ===== N-BIDS REFORMAT PAGE ===== -->
+  <div class="page-view" id="page-nbids"></div>
+
   <!-- ===== DASHBOARD PAGE ===== -->
-  <div class="page-view" id="page-dashboard"></div>
+  <div class="page-view active" id="page-dashboard"></div>
 
   <!-- ===== GLOBAL GLOBE BACKGROUND ===== -->
   <div class="globe-bg-container">
@@ -383,9 +410,17 @@
 
   <!-- ===== ABOUT ROADMAP PAGE ===== -->
   <div class="page-view" id="page-roadmap"></div>
+
+  <!-- ===== DUTY SWAP PAGE ===== -->
+  <div class="page-view" id="page-dutyswap"></div>
+
+  <!-- ===== DUTY SWAP II PAGE ===== -->
+  <div class="page-view" id="page-dutyswap2"></div>
 </main>
 
 <script src="js/nav.js"></script>
+<script src="js/dutyswap.js"></script>
+<script src="js/nbids.js"></script>
 <script src="js/loadsql.js"></script>
 <script src="js/converter.js"></script>
 <script src="js/bids-analysis.js"></script>
@@ -395,5 +430,21 @@
 <script src="js/about-map.js"></script>
 <script src="js/model.js"></script>
 <script src="js/roadmap.js"></script>
+<script>
+// ── Live reload (dev only) ──────────────────────────────────────────────────
+(function () {
+  function connect() {
+    const es = new EventSource('/api/livereload');
+    es.onmessage = function (e) {
+      if (e.data === 'reload') location.reload();
+    };
+    es.onerror = function () {
+      es.close();
+      setTimeout(connect, 2000); // reconnect after 2 s if server restarted
+    };
+  }
+  connect();
+})();
+</script>
 </body>
 </html>

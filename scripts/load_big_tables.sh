@@ -5,7 +5,7 @@
 TABLES_DIR="$HOME/rois_tg_live_load/tables/big_tables"
 LOG="$HOME/rois_tg_live_load/logs/big_tables.log"
 DB="rois_tg_live_prod"
-MYSQL="mysql -u debian-sys-maint -pR2QY1jwpPm0Vxoyf $DB"
+MYSQL="mysql -uroot -pR@iscrew2026 $DB"
 
 mkdir -p "$HOME/rois_tg_live_load/logs"
 
@@ -39,8 +39,8 @@ declare -A TABLES=(
 )
 
 log "=== Big Table Sequential Load Start ==="
-log "Buffer pool: $(mysql -u debian-sys-maint -pR2QY1jwpPm0Vxoyf -se 'SELECT @@innodb_buffer_pool_size/1024/1024/1024' 2>/dev/null)GB"
-log "Free RAM: $(free -h | awk '/^Mem:/{print $4}')"
+log "Buffer pool: $(mysql -uroot -pR@iscrew2026 -se 'SELECT @@innodb_buffer_pool_size/1024/1024/1024' 2>/dev/null)GB"
+log "Free RAM: $(vm_stat | awk '/Pages free/{printf "%.1fGB\n", $3*4096/1024/1024/1024}')"
 
 for tbl in tbl_0428 tbl_0429 tbl_0455 tbl_0419 tbl_0447 tbl_0411; do
     tname="${TABLES[$tbl]}"
@@ -58,7 +58,7 @@ for tbl in tbl_0428 tbl_0429 tbl_0455 tbl_0419 tbl_0447 tbl_0411; do
     if [ $failed -eq 0 ]; then
         log "COMPLETE $tname — all chunks loaded OK"
         # Verify row count
-        rows=$(mysql -u debian-sys-maint -pR2QY1jwpPm0Vxoyf $DB -se "SELECT COUNT(*) FROM \`$tname\`" 2>/dev/null)
+        rows=$(mysql -uroot -pR@iscrew2026 $DB -se "SELECT COUNT(*) FROM \`$tname\`" 2>/dev/null)
         log "ROW COUNT $tname = $rows"
         # Move original to completed
         mv "$TABLES_DIR/$tbl" "$HOME/rois_tg_live_load/tables/completed/$tbl" 2>/dev/null

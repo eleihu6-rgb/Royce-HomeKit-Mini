@@ -1,0 +1,151 @@
+    <div class="page-header">
+      <div class="page-title-area">
+        <div class="page-eyebrow">Crew Scheduling Tools</div>
+        <div class="page-title">N-Bids Reformat</div>
+        <div class="page-subtitle">Parse crew bid strings from a TXT file and export structured Excel output</div>
+      </div>
+    </div>
+
+    <div class="converter-grid">
+      <!-- LEFT: Upload + Log -->
+      <div style="display:flex;flex-direction:column;gap:20px;">
+
+        <!-- Upload Panel -->
+        <div class="upload-panel">
+          <div class="panel-header">
+            <div class="panel-header-icon">📄</div>
+            <div class="panel-title">Upload Bid TXT File</div>
+          </div>
+
+          <div class="upload-zone" id="nbids-upload-zone">
+            <input type="file" id="nbids-file-input" accept=".txt,.tsv,.csv" multiple>
+            <span class="upload-icon">📂</span>
+            <div class="upload-title">Drop TXT Bid Files Here</div>
+            <div class="upload-subtitle">
+              Select one or more PBS bid report TXT files<br>
+              Period is auto-detected from each file
+            </div>
+            <div class="upload-formats">
+              <span class="format-tag">TXT</span>
+              <span class="format-tag">MULTI-FILE</span>
+            </div>
+          </div>
+
+          <div class="file-list" id="nbids-file-display" style="display:none;">
+            <div id="nbids-file-name" style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text-primary);padding:8px 16px;line-height:1.8;"></div>
+          </div>
+
+          <div style="padding:12px 0 4px;display:flex;gap:12px;align-items:center;">
+            <span style="font-family:'Inter',sans-serif;font-size:12px;color:var(--text-secondary);">Period</span>
+            <input id="nbids-period" type="text" placeholder="Auto-detected from file"
+              style="background:var(--bg-elevated);border:1px solid var(--border-dim);border-radius:8px;padding:6px 12px;color:var(--text-primary);font-family:'Share Tech Mono',monospace;font-size:12px;outline:none;width:130px;">
+          </div>
+
+          <div class="progress-bar-wrap" id="nbids-progress-wrap" style="display:none;">
+            <div class="progress-bar-fill" id="nbids-progress-bar" style="width:0%"></div>
+          </div>
+
+          <button class="convert-btn" id="nbids-process-btn" onclick="nbidsProcess()" disabled>
+            <span class="spinner" id="nbids-spinner"></span>
+            <span id="nbids-btn-text">⇄ &nbsp; PROCESS &amp; CONVERT</span>
+          </button>
+        </div>
+
+        <!-- Log Panel -->
+        <div class="log-panel">
+          <div class="panel-header">
+            <div class="panel-header-icon" style="font-size:10px;">▶</div>
+            <div class="panel-title">Processing Log</div>
+            <div class="panel-count" id="nbids-log-count">0 ENTRIES</div>
+          </div>
+          <div class="log-body" id="nbids-log-body">
+            <div class="log-entry">
+              <span class="log-msg info">Ready · Select a TXT file to begin</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: Stats + Result -->
+      <div class="config-panel">
+
+        <!-- Stats -->
+        <div class="config-card">
+          <div class="config-card-header">◎ Input Format</div>
+          <div class="config-body">
+            <div class="config-row">
+              <span class="config-label">Column 1</span>
+              <span class="config-value">crew_id</span>
+            </div>
+            <div class="config-row">
+              <span class="config-label">Column 2</span>
+              <span class="config-value">bid_context</span>
+            </div>
+            <div class="config-row">
+              <span class="config-label">Column 3</span>
+              <span class="config-value">layer (1–24)</span>
+            </div>
+            <div class="config-row">
+              <span class="config-label">Column 4</span>
+              <span class="config-value">bid_string</span>
+            </div>
+            <div class="config-row" style="border-bottom:none">
+              <span class="config-label">Delimiter</span>
+              <span class="config-value">Tab or Comma</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Result card -->
+        <div class="result-card" id="nbids-result-card" style="display:none;">
+          <div class="result-header">
+            <div class="result-check">✓</div>
+            <div class="result-title">Conversion Complete</div>
+          </div>
+          <div class="result-body">
+            <div class="result-stats">
+              <div class="result-stat">
+                <div class="result-stat-val" id="nbids-res-rows">—</div>
+                <div class="result-stat-lbl">Input Rows</div>
+              </div>
+              <div class="result-stat">
+                <div class="result-stat-val" id="nbids-res-files">—</div>
+                <div class="result-stat-lbl">Files</div>
+              </div>
+              <div class="result-stat">
+                <div class="result-stat-val" id="nbids-res-parsed">—</div>
+                <div class="result-stat-lbl">Parsed</div>
+              </div>
+              <div class="result-stat">
+                <div class="result-stat-val" id="nbids-res-groups">—</div>
+                <div class="result-stat-lbl">Groups</div>
+              </div>
+              <div class="result-stat">
+                <div class="result-stat-val" id="nbids-res-errors">—</div>
+                <div class="result-stat-lbl">Errors</div>
+              </div>
+            </div>
+            <button class="download-btn" id="nbids-download-btn" onclick="nbidsDownload()">
+              ⬇ &nbsp; SAVE EXCEL FILE
+            </button>
+          </div>
+        </div>
+
+        <!-- Output format -->
+        <div class="config-card">
+          <div class="config-card-header">⚙ Output Excel Sheets</div>
+          <div class="config-body">
+            <div class="config-row">
+              <span class="config-label">Sheet 1</span>
+              <span class="config-value">Parsed Bids</span>
+            </div>
+            <div class="config-row" style="border-bottom:none">
+              <span class="config-label">Sheet 2</span>
+              <span class="config-value">Errors</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>

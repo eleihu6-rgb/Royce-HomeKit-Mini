@@ -6,7 +6,8 @@
 # Max recommended: 4 workers (matches CPU cores)
 # ============================================================
 
-BASE_DIR="/home/eleihu6/rois_tg_live_load"
+BASE_DIR="$HOME/rois_tg_live_load"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 NUM_WORKERS="${1:-3}"
 LOG_DIR="$BASE_DIR/logs"
 mkdir -p "$LOG_DIR"
@@ -50,7 +51,7 @@ if [ "$PENDING" -eq 0 ]; then
 fi
 
 # Start monitor agent
-nohup bash "$BASE_DIR/monitor.sh" >> "$LOG_DIR/monitor.log" 2>&1 &
+nohup bash "$SCRIPT_DIR/monitor.sh" >> "$LOG_DIR/monitor.log" 2>&1 &
 MON_PID=$!
 echo " [MONITOR ] PID $MON_PID → logs/monitor.log"
 
@@ -58,7 +59,7 @@ sleep 1
 
 # Start worker agents
 for i in $(seq 1 $NUM_WORKERS); do
-    nohup bash "$BASE_DIR/worker.sh" $i >> "$LOG_DIR/worker_${i}.log" 2>&1 &
+    nohup bash "$SCRIPT_DIR/worker.sh" $i >> "$LOG_DIR/worker_${i}.log" 2>&1 &
     WPD=$!
     echo " [WORKER $i] PID $WPD → logs/worker_${i}.log"
     sleep 0.5

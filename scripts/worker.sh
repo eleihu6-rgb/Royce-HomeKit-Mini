@@ -7,7 +7,7 @@
 # ============================================================
 
 WORKER_ID="${1:-1}"
-BASE_DIR="/home/eleihu6/rois_tg_live_load"
+BASE_DIR="$HOME/rois_tg_live_load"
 PENDING_DIR="$BASE_DIR/tables"
 IN_PROGRESS_DIR="$BASE_DIR/tables/in_progress"
 COMPLETED_DIR="$BASE_DIR/tables/completed"
@@ -16,7 +16,7 @@ AUDIT_LOG="$BASE_DIR/logs/ROW_AUDIT.log"
 FAILED_LOG="$BASE_DIR/logs/FAILED.log"
 WORKER_LOG="$BASE_DIR/logs/worker_${WORKER_ID}.log"
 DB="rois_tg_live_prod"
-MYSQL="mysql -u debian-sys-maint -pR2QY1jwpPm0Vxoyf $DB"
+MYSQL="mysql -uroot -pR@iscrew2026 $DB"
 
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] [W$WORKER_ID] $*" | tee -a "$WORKER_LOG"; }
 
@@ -62,7 +62,7 @@ while true; do
 
     # --- Run import ---
     START_TS=$(date +%s)
-    IMPORT_OUT=$(mysql -u debian-sys-maint -pR2QY1jwpPm0Vxoyf "$DB" < "$CLAIMED" 2>&1)
+    IMPORT_OUT=$(mysql -uroot -pR@iscrew2026 "$DB" < "$CLAIMED" 2>&1)
     IMPORT_EXIT=$?
     END_TS=$(date +%s)
     ELAPSED=$(( END_TS - START_TS ))
@@ -76,7 +76,7 @@ while true; do
     fi
 
     # --- Count DB rows after import ---
-    DB_ROWS=$(mysql -u debian-sys-maint -pR2QY1jwpPm0Vxoyf "$DB" -sNe "SELECT COUNT(*) FROM \`$TABLE_NAME\`;" 2>/dev/null || echo "?")
+    DB_ROWS=$(mysql -uroot -pR@iscrew2026 "$DB" -sNe "SELECT COUNT(*) FROM \`$TABLE_NAME\`;" 2>/dev/null || echo "?")
 
     log "OK $FNAME | table=$TABLE_NAME | sql_rows=$SQL_ROWS | db_rows=$DB_ROWS | ${ELAPSED}s"
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] OK      | W$WORKER_ID | $FNAME | table=$TABLE_NAME | sql_rows=$SQL_ROWS | db_rows=$DB_ROWS | ${ELAPSED}s" >> "$AUDIT_LOG"

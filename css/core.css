@@ -6,18 +6,18 @@
   --bg-card: rgba(25, 25, 35, 0.5);
   --bg-elevated: rgba(35, 35, 48, 0.6);
 
-  /* Accent colors - softer, more ethereal */
-  --accent-primary: #a78bfa;
-  --accent-secondary: #c4b5fd;
+  /* Accent colors */
+  --accent-primary: #b89dff;   /* was #a78bfa — bumped 15% lighter for readability */
+  --accent-secondary: #d8ccff; /* was #c4b5fd — light lavender, clearly readable */
   --accent-warning: #fbbf24;
   --accent-danger: #f87171;
   --accent-glow: rgba(167, 139, 250, 0.4);
 
-  /* Text colors - improved contrast */
+  /* Text colors */
   --text-primary: #fafafa;
-  --text-secondary: rgba(250, 250, 250, 0.7);
-  --text-muted: rgba(250, 250, 250, 0.45);
-  --text-mono: #a78bfa;
+  --text-secondary: rgba(250, 250, 250, 0.75);  /* was 0.7 */
+  --text-muted: rgba(250, 250, 250, 0.55);       /* was 0.45 — was failing contrast */
+  --text-mono: #d8ccff;                          /* was #a78bfa — now matches accent-secondary */
 
   /* Borders - subtle glass effect */
   --border-dim: rgba(255, 255, 255, 0.06);
@@ -122,10 +122,16 @@ body {
   display: flex;
   flex-direction: column;
   z-index: 100;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   transition: width 0.35s cubic-bezier(.6,.6,0,1), border-color 0.35s;
 }
 .sidebar.collapsed { width: 0; border-right-color: transparent; }
+
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+.sidebar::-webkit-scrollbar-thumb:hover { background: var(--accent-primary); }
 
 /* Sidebar toggle buttons */
 .sidebar-toggle {
@@ -249,7 +255,7 @@ body {
 }
 
 .sidebar-section-label {
-  padding: 20px 24px 8px;
+  padding: 14px 24px 6px;
   font-size: 10px;
   font-family: 'Inter', sans-serif;
   font-weight: 600;
@@ -261,7 +267,6 @@ body {
 .nav-item {
   margin: 2px 12px;
   border-radius: 10px;
-  overflow: hidden;
   cursor: pointer;
   transition: all 0.3s var(--ease-smooth);
   position: relative;
@@ -294,24 +299,26 @@ body {
 }
 
 .nav-item-inner {
-  padding: 12px 16px;
+  padding: 10px 14px;
   border: 1px solid transparent;
   border-radius: 10px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  flex-wrap: nowrap;
+  gap: 10px;
   transition: all 0.3s var(--ease-smooth);
+  min-width: 0;
 }
 
 .nav-icon {
-  width: 32px; height: 32px;
+  width: 28px; height: 28px;
   background: var(--bg-elevated);
   border: 1px solid var(--border-dim);
-  border-radius: 8px;
+  border-radius: 7px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 13px;
   flex-shrink: 0;
   transition: all 0.3s var(--ease-smooth);
 }
@@ -335,6 +342,11 @@ body {
   color: var(--text-secondary);
   letter-spacing: 0.3px;
   transition: color 0.2s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
 }
 
 .nav-item.active .nav-label,
@@ -1699,4 +1711,71 @@ body {
 }
 [data-theme="light"] ::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.25);
+}
+
+/* ===== NAV SUBMENU ===== */
+.nav-submenu {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s var(--ease-smooth);
+}
+.nav-submenu.open {
+  max-height: 200px;
+}
+.nav-sub-item {
+  margin: 2px 12px 2px 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-smooth);
+}
+.nav-sub-item:hover {
+  background: rgba(167, 139, 250, 0.08);
+}
+.nav-sub-item.active {
+  background: rgba(167, 139, 250, 0.12);
+}
+.nav-sub-item.active .nav-sub-inner {
+  border-color: var(--accent-primary);
+}
+.nav-sub-inner {
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s var(--ease-smooth);
+}
+.nav-sub-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+.nav-sub-item:hover .nav-sub-dot,
+.nav-sub-item.active .nav-sub-dot {
+  background: var(--accent-primary);
+  box-shadow: 0 0 6px var(--accent-primary);
+}
+.nav-sub-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--text-secondary);
+  letter-spacing: 0.3px;
+  transition: color 0.2s;
+}
+.nav-sub-item:hover .nav-sub-label,
+.nav-sub-item.active .nav-sub-label {
+  color: var(--text-primary);
+}
+.nav-expand-arrow {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--text-muted);
+  transition: transform 0.3s var(--ease-smooth);
+}
+.nav-item.submenu-open .nav-expand-arrow {
+  transform: rotate(90deg);
 }

@@ -6,9 +6,10 @@
 #                          ~/rois_tg_live_load/FAILED.log
 #                          ~/rois_tg_live_load/PROGRESS_REPORT.txt (updated every 30s by watch_progress.sh)
 
-BASE_DIR="/home/eleihu6/rois_tg_live_load"
+BASE_DIR="$HOME/rois_tg_live_load"
 TABLES_DIR="$BASE_DIR/tables"
-IMPORT_SCRIPT="/home/eleihu6/Royce-Homekit/scripts/import_table.sh"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+IMPORT_SCRIPT="$SCRIPT_DIR/import_table.sh"
 WORKERS=2
 
 chmod +x "$IMPORT_SCRIPT"

@@ -1,0 +1,1070 @@
+<style>
+/* ===================================================================
+   DUTY SWAP II — Thai Airways Light Theme
+   Real observations from thaiairways.com:
+     · Bellefair serif for headings
+     · Inter for body
+     · Body bg: #ffffff, text: rgb(33,37,41)
+     · Brand purple: #3A1065 → orchid pink: #CC1D82 gradient
+     · Gold accent: #C9A84C
+     · White content sections, dark purple text
+   =================================================================== */
+
+:root {
+  --ta-purple:   #3A1065;
+  --ta-orchid:   #7B2FBE;
+  --ta-pink:     #CC1D82;
+  --ta-gold:     #C9A84C;
+  --ta-text:     #1a0830;
+  --ta-sub:      #555566;
+  --ta-muted:    #888899;
+  --ta-bg:       #ffffff;
+  --ta-bg-tint:  #f7f3ff;   /* very light lavender tint for alternate sections */
+  --ta-border:   rgba(58, 16, 101, 0.10);
+  --ta-hero-grad: linear-gradient(125deg, #1e0640 0%, #3A1065 25%, #7B2FBE 60%, #CC1D82 100%);
+}
+
+/* Scope all styles to this page */
+#ds2-wrap {
+  font-family: 'Inter', sans-serif;
+  color: var(--ta-text);
+  background: var(--ta-bg);
+  line-height: 1.6;
+}
+#ds2-wrap * { box-sizing: border-box; }
+
+/* ================================================================
+   BRAND STRIP — Thai Airways announcement bar style
+   ================================================================ */
+#ds2-wrap .ds2-brand-strip {
+  background: linear-gradient(90deg, var(--ta-purple) 0%, var(--ta-orchid) 60%, var(--ta-pink) 100%);
+  padding: 8px 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid var(--ta-gold);
+}
+#ds2-wrap .ds2-brand-name {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: rgba(255,255,255,0.92);
+  text-transform: uppercase;
+}
+#ds2-wrap .ds2-brand-tagline {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase;
+}
+
+/* ================================================================
+   HERO — dark gradient, full viewport, Thai Airways style
+   ================================================================ */
+#ds2-wrap .ds2-hero {
+  position: relative;
+  min-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 80px 72px 100px;
+  background: var(--ta-hero-grad);
+  overflow: hidden;
+}
+
+/* Large aircraft watermark — Thai Airways signature motif */
+#ds2-wrap .ds2-hero::before {
+  content: '✈';
+  position: absolute;
+  right: -40px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: clamp(260px, 32vw, 440px);
+  opacity: 0.06;
+  color: #fff;
+  pointer-events: none;
+  user-select: none;
+  line-height: 1;
+}
+/* Orchid pink radial bloom — right side (matches thaiairways.com) */
+#ds2-wrap .ds2-hero::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 40%;
+  background: radial-gradient(ellipse at right center,
+    rgba(204,29,130,0.40) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Right decorative column */
+#ds2-wrap .ds2-hero-deco {
+  position: absolute;
+  right: 56px; top: 0; bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  z-index: 1;
+}
+#ds2-wrap .ds2-hero-deco-line {
+  width: 1px;
+  height: 160px;
+  background: linear-gradient(180deg, transparent, rgba(201,168,76,0.7), transparent);
+}
+#ds2-wrap .ds2-hero-deco-text {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 5px;
+  color: rgba(201,168,76,0.55);
+  writing-mode: vertical-rl;
+  text-transform: uppercase;
+}
+#ds2-wrap .ds2-hero-deco-diamond {
+  color: rgba(201,168,76,0.65);
+  font-size: 11px;
+}
+
+#ds2-wrap .ds2-hero-content { max-width: 680px; position: relative; z-index: 1; }
+
+#ds2-wrap .ds2-hero-eyebrow {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: rgba(201,168,76,0.85);
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+#ds2-wrap .ds2-hero-eyebrow::before {
+  content: '';
+  width: 36px; height: 2px;
+  background: linear-gradient(90deg, rgba(201,168,76,0.8), transparent);
+}
+
+/* Bellefair — Thai Airways actual headline font */
+#ds2-wrap .ds2-hero-title {
+  font-family: 'Bellefair', serif;
+  font-size: clamp(52px, 8vw, 88px);
+  font-weight: 400;
+  color: #ffffff;
+  letter-spacing: 2px;
+  line-height: 0.95;
+  margin-bottom: 6px;
+}
+#ds2-wrap .ds2-hero-title-accent {
+  font-family: 'Bellefair', serif;
+  font-size: clamp(22px, 3vw, 38px);
+  font-weight: 400;
+  color: rgba(255,255,255,0.72);
+  letter-spacing: 10px;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+}
+
+#ds2-wrap .ds2-hero-rule {
+  width: 48px; height: 2px;
+  background: var(--ta-gold);
+  margin-bottom: 24px;
+}
+
+#ds2-wrap .ds2-hero-subtitle {
+  font-size: 15px;
+  color: rgba(255,255,255,0.72);
+  line-height: 1.85;
+  max-width: 520px;
+  margin-bottom: 40px;
+}
+
+#ds2-wrap .ds2-hero-pills {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  margin-bottom: 0;
+}
+#ds2-wrap .ds2-hero-pill {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(201,168,76,0.9);
+  border: 1px solid rgba(201,168,76,0.4);
+  background: rgba(201,168,76,0.07);
+  padding: 6px 16px;
+}
+
+/* Scroll chevron */
+#ds2-wrap .ds2-chevron {
+  position: absolute;
+  bottom: 36px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  z-index: 1;
+  animation: ds2Bounce 2.2s ease-in-out infinite;
+}
+#ds2-wrap .ds2-chevron-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 8px; letter-spacing: 4px;
+  color: rgba(255,255,255,0.35);
+  text-transform: uppercase;
+}
+#ds2-wrap .ds2-chevron-arrow {
+  color: rgba(255,255,255,0.4);
+  font-size: 20px;
+}
+@keyframes ds2Bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%       { transform: translateX(-50%) translateY(10px); }
+}
+
+/* ================================================================
+   LIGHT SECTION SCAFFOLD — Thai Airways white-content-section style
+   ================================================================ */
+#ds2-wrap .ds2-section {
+  padding: 88px 72px;
+  background: var(--ta-bg);
+  border-top: 1px solid var(--ta-border);
+}
+#ds2-wrap .ds2-section--tint {
+  background: var(--ta-bg-tint);
+}
+#ds2-wrap .ds2-section--dark {
+  background: var(--ta-hero-grad);
+  border-top: 2px solid rgba(201,168,76,0.4);
+}
+
+/* Gold diamond divider between sections */
+#ds2-wrap .ds2-divider {
+  text-align: center;
+  line-height: 0;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+#ds2-wrap .ds2-divider::before,
+#ds2-wrap .ds2-divider::after {
+  content: '';
+  display: inline-block;
+  width: 80px; height: 1px;
+  background: var(--ta-gold);
+  vertical-align: middle;
+  opacity: 0.45;
+}
+#ds2-wrap .ds2-divider-diamond {
+  display: inline-block;
+  color: var(--ta-gold);
+  font-size: 11px;
+  margin: 0 12px;
+  vertical-align: middle;
+  opacity: 0.75;
+}
+
+/* Section eyebrow */
+#ds2-wrap .ds2-eyebrow {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 5px;
+  color: var(--ta-orchid);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+#ds2-wrap .ds2-eyebrow--light {
+  color: rgba(201,168,76,0.85);
+}
+#ds2-wrap .ds2-eyebrow::before {
+  content: '';
+  width: 24px; height: 1px;
+  background: currentColor;
+  opacity: 0.6;
+}
+
+/* Section title — Bellefair, dark purple text on white bg */
+#ds2-wrap .ds2-title {
+  font-family: 'Bellefair', serif;
+  font-size: clamp(28px, 3.5vw, 46px);
+  font-weight: 400;
+  color: var(--ta-text);
+  line-height: 1.1;
+  margin-bottom: 18px;
+  padding-left: 18px;
+  border-left: 3px solid var(--ta-gold);
+  letter-spacing: 0.3px;
+}
+#ds2-wrap .ds2-title--center {
+  text-align: center;
+  border-left: none;
+  padding-left: 0;
+}
+#ds2-wrap .ds2-title--light {
+  color: #fff;
+  border-left-color: var(--ta-gold);
+}
+
+/* Lead paragraph */
+#ds2-wrap .ds2-lead {
+  font-size: 15px;
+  color: var(--ta-sub);
+  line-height: 1.8;
+  max-width: 580px;
+  margin-bottom: 44px;
+}
+#ds2-wrap .ds2-lead--center {
+  text-align: center;
+  margin-left: auto; margin-right: auto;
+}
+#ds2-wrap .ds2-lead--light { color: rgba(255,255,255,0.72); }
+
+/* ================================================================
+   TWO COLUMN
+   ================================================================ */
+#ds2-wrap .ds2-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: center;
+}
+#ds2-wrap .ds2-two-col--flip { direction: rtl; }
+#ds2-wrap .ds2-two-col--flip > * { direction: ltr; }
+
+/* ================================================================
+   PROBLEM CARDS — light card style
+   ================================================================ */
+#ds2-wrap .ds2-problem-cards {
+  display: flex; flex-direction: column; gap: 16px;
+}
+#ds2-wrap .ds2-problem-card {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 22px 24px;
+  background: #fff;
+  border: 1px solid var(--ta-border);
+  border-left: 3px solid var(--ta-gold);
+  box-shadow: 0 2px 12px rgba(58,16,101,0.06);
+}
+#ds2-wrap .ds2-problem-num {
+  font-family: 'Bellefair', serif;
+  font-size: 40px;
+  font-weight: 400;
+  color: rgba(58,16,101,0.12);
+  line-height: 1;
+  flex-shrink: 0;
+  width: 48px;
+}
+#ds2-wrap .ds2-problem-title {
+  font-family: 'Bellefair', serif;
+  font-size: 18px;
+  color: var(--ta-text);
+  margin-bottom: 5px;
+}
+#ds2-wrap .ds2-problem-desc {
+  font-size: 13px;
+  color: var(--ta-sub);
+  line-height: 1.75;
+}
+
+/* ================================================================
+   PROCESS FLOW — Section 02
+   ================================================================ */
+#ds2-wrap .ds2-flow {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  margin-top: 48px;
+}
+#ds2-wrap .ds2-flow::before {
+  content: '';
+  position: absolute;
+  top: 27px; left: 12.5%; right: 12.5%;
+  border-top: 1px dashed rgba(201,168,76,0.55);
+  pointer-events: none;
+}
+#ds2-wrap .ds2-flow-step {
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center;
+  padding: 0 20px;
+}
+#ds2-wrap .ds2-flow-node {
+  width: 54px; height: 54px;
+  border-radius: 50%;
+  border: 2px solid var(--ta-gold);
+  background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 18px;
+  font-size: 20px;
+  position: relative; z-index: 1;
+  box-shadow: 0 2px 12px rgba(201,168,76,0.2);
+}
+#ds2-wrap .ds2-flow-step-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 8px; letter-spacing: 3px;
+  color: var(--ta-gold);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+#ds2-wrap .ds2-flow-title {
+  font-family: 'Bellefair', serif;
+  font-size: 17px;
+  color: var(--ta-text);
+  margin-bottom: 8px;
+}
+#ds2-wrap .ds2-flow-desc {
+  font-size: 12px;
+  color: var(--ta-sub);
+  line-height: 1.65;
+}
+
+/* ================================================================
+   FEATURE LIST — Thai Airways left gold border style
+   ================================================================ */
+#ds2-wrap .ds2-features {
+  display: flex; flex-direction: column; gap: 26px;
+}
+#ds2-wrap .ds2-feature {
+  padding-left: 20px;
+  border-left: 2px solid var(--ta-gold);
+}
+#ds2-wrap .ds2-feature-title {
+  font-family: 'Bellefair', serif;
+  font-size: 18px;
+  color: var(--ta-text);
+  margin-bottom: 4px;
+}
+#ds2-wrap .ds2-feature-desc {
+  font-size: 13px;
+  color: var(--ta-sub);
+  line-height: 1.75;
+}
+
+/* ================================================================
+   SCREENSHOT FRAME
+   ================================================================ */
+#ds2-wrap .ds2-screenshot-frame {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(58,16,101,0.12);
+  background: #f0eef8;
+  box-shadow: 0 8px 40px rgba(58,16,101,0.12), 0 2px 8px rgba(0,0,0,0.06);
+}
+#ds2-wrap .ds2-chrome-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  background: #ece8f5;
+  border-bottom: 1px solid rgba(58,16,101,0.1);
+}
+#ds2-wrap .ds2-dots { display: flex; gap: 5px; }
+#ds2-wrap .ds2-dot  { width: 10px; height: 10px; border-radius: 50%; }
+#ds2-wrap .ds2-dot:nth-child(1) { background: #f87171; }
+#ds2-wrap .ds2-dot:nth-child(2) { background: #fbbf24; }
+#ds2-wrap .ds2-dot:nth-child(3) { background: #4ade80; }
+#ds2-wrap .ds2-url {
+  flex: 1;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  color: #888;
+  background: rgba(255,255,255,0.7);
+  padding: 3px 10px;
+  border-radius: 3px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+#ds2-wrap .ds2-img { width: 100%; height: auto; display: block; }
+#ds2-wrap .ds2-caption {
+  padding: 9px 14px;
+  font-size: 10px;
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--ta-orchid);
+  letter-spacing: 0.8px;
+  border-top: 1px solid rgba(58,16,101,0.08);
+  background: #fff;
+}
+
+/* ================================================================
+   CREW PORTAL STEPS
+   ================================================================ */
+#ds2-wrap .ds2-crew-steps {
+  display: flex; flex-direction: column; gap: 72px;
+  margin-top: 48px;
+}
+#ds2-wrap .ds2-crew-step-header {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 16px;
+}
+#ds2-wrap .ds2-crew-step-badge {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 8px; letter-spacing: 3px;
+  color: var(--ta-orchid);
+  border: 1px solid rgba(123,47,190,0.3);
+  background: rgba(123,47,190,0.06);
+  padding: 4px 12px;
+  text-transform: uppercase;
+}
+#ds2-wrap .ds2-crew-step-title {
+  font-family: 'Bellefair', serif;
+  font-size: 22px;
+  color: var(--ta-text);
+}
+#ds2-wrap .ds2-crew-step-desc {
+  font-size: 13px;
+  color: var(--ta-sub);
+  line-height: 1.8;
+  max-width: 700px;
+  margin-bottom: 22px;
+}
+#ds2-wrap .ds2-crew-img-full { max-width: 860px; }
+#ds2-wrap .ds2-crew-side {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+#ds2-wrap .ds2-pdpa-points {
+  padding-top: 8px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+#ds2-wrap .ds2-pdpa-point {
+  font-size: 13px;
+  color: var(--ta-sub);
+  line-height: 1.7;
+  padding-left: 16px;
+  border-left: 2px solid rgba(201,168,76,0.4);
+}
+#ds2-wrap .ds2-dual-imgs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* ================================================================
+   CONTROLLER VIEW — Section 06
+   ================================================================ */
+#ds2-wrap .ds2-stat-trio {
+  display: flex; flex-direction: column;
+  margin-bottom: 36px;
+}
+#ds2-wrap .ds2-stat-row-item {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--ta-border);
+}
+#ds2-wrap .ds2-stat-row-item:first-child {
+  border-top: 1px solid var(--ta-border);
+}
+#ds2-wrap .ds2-stat-num {
+  font-family: 'Bellefair', serif;
+  font-size: 52px;
+  color: var(--ta-purple);
+  line-height: 1;
+  letter-spacing: -1px;
+}
+#ds2-wrap .ds2-stat-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--ta-muted);
+  text-transform: uppercase;
+}
+#ds2-wrap .ds2-bullets {
+  display: flex; flex-direction: column; gap: 12px;
+}
+#ds2-wrap .ds2-bullet {
+  font-size: 13px;
+  color: var(--ta-sub);
+  line-height: 1.65;
+  padding-left: 16px;
+  border-left: 2px solid rgba(201,168,76,0.4);
+}
+
+/* ================================================================
+   IMPACT SECTION — dark gradient, Thai Airways signature
+   ================================================================ */
+#ds2-wrap .ds2-impact-title-wrap {
+  text-align: center;
+  margin-bottom: 56px;
+}
+#ds2-wrap .ds2-impact-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+}
+#ds2-wrap .ds2-impact-cell {
+  padding: 40px 28px;
+  background: rgba(0,0,0,0.18);
+  border: 1px solid rgba(201,168,76,0.15);
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center; gap: 8px;
+}
+#ds2-wrap .ds2-impact-num {
+  font-family: 'Bellefair', serif;
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 400;
+  color: #fff;
+  line-height: 1;
+}
+#ds2-wrap .ds2-impact-rule {
+  width: 32px; height: 2px;
+  background: var(--ta-gold);
+}
+#ds2-wrap .ds2-impact-unit {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px; letter-spacing: 3px;
+  color: rgba(255,255,255,0.85);
+  text-transform: uppercase;
+}
+#ds2-wrap .ds2-impact-before {
+  font-size: 10px;
+  color: rgba(255,255,255,0.35);
+  font-family: 'Share Tech Mono', monospace;
+}
+
+/* ================================================================
+   FOOTER
+   ================================================================ */
+#ds2-wrap .ds2-footer {
+  background: var(--ta-purple);
+  border-top: 2px solid var(--ta-gold);
+  padding: 22px 72px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+#ds2-wrap .ds2-footer-text {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px; letter-spacing: 2px;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+}
+#ds2-wrap .ds2-footer-orchid {
+  font-size: 16px; opacity: 0.55; letter-spacing: 8px;
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media (max-width: 960px) {
+  #ds2-wrap .ds2-hero     { padding: 72px 32px 96px; }
+  #ds2-wrap .ds2-section  { padding: 64px 32px; }
+  #ds2-wrap .ds2-brand-strip,
+  #ds2-wrap .ds2-footer   { padding-left: 32px; padding-right: 32px; }
+  #ds2-wrap .ds2-two-col  { grid-template-columns: 1fr; gap: 40px; }
+  #ds2-wrap .ds2-two-col--flip { direction: ltr; }
+  #ds2-wrap .ds2-flow     { grid-template-columns: 1fr 1fr; gap: 40px; }
+  #ds2-wrap .ds2-flow::before { display: none; }
+  #ds2-wrap .ds2-impact-grid { grid-template-columns: 1fr 1fr; }
+  #ds2-wrap .ds2-hero-deco { display: none; }
+  #ds2-wrap .ds2-crew-side { grid-template-columns: 1fr; }
+  #ds2-wrap .ds2-dual-imgs { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  #ds2-wrap .ds2-flow        { grid-template-columns: 1fr; }
+  #ds2-wrap .ds2-impact-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+
+<div id="ds2-wrap">
+
+  <!-- BRAND STRIP -->
+  <div class="ds2-brand-strip">
+    <span class="ds2-brand-name">Royal Orchid Service · Crew Intelligence Division</span>
+    <span class="ds2-brand-tagline">ROIs Platform · Thai Airways</span>
+  </div>
+
+  <!-- HERO -->
+  <div class="ds2-hero">
+    <div class="ds2-hero-deco">
+      <div class="ds2-hero-deco-line"></div>
+      <div class="ds2-hero-deco-text">Thai Airways × ROIs · Crew Intelligence · 2026</div>
+      <div class="ds2-hero-deco-diamond">◆</div>
+      <div class="ds2-hero-deco-line"></div>
+    </div>
+    <div class="ds2-hero-content">
+      <div class="ds2-hero-eyebrow">Royal Orchid Service · Crew Management Division</div>
+      <div class="ds2-hero-title">CREW DUTY SWAP</div>
+      <div class="ds2-hero-title-accent">Intelligence</div>
+      <div class="ds2-hero-rule"></div>
+      <div class="ds2-hero-subtitle">
+        Automated duty-swap awarding with real-time legality validation —
+        full award cycle completed without crew controller intervention.
+        Serving 4,300 crew across the network.
+      </div>
+      <div class="ds2-hero-pills">
+        <span class="ds2-hero-pill">4.3K Crew</span>
+        <span class="ds2-hero-pill">Real-Time Legality</span>
+        <span class="ds2-hero-pill">Full Auto Award</span>
+        <span class="ds2-hero-pill">PDPA Compliant</span>
+      </div>
+    </div>
+    <div class="ds2-chevron">
+      <span class="ds2-chevron-label">Scroll</span>
+      <span class="ds2-chevron-arrow">↓</span>
+    </div>
+  </div>
+
+  <!-- DIVIDER -->
+  <div class="ds2-divider">
+    <span class="ds2-divider-diamond">◆</span>
+  </div>
+
+  <!-- SECTION 01 — THE CHALLENGE -->
+  <div class="ds2-section">
+    <div class="ds2-eyebrow">01 · The Challenge</div>
+    <div class="ds2-two-col">
+      <div>
+        <div class="ds2-title">The Manual Process Problem</div>
+        <div class="ds2-lead">
+          Before automation, crew controllers spent nearly half their working hours
+          on duty-swap requests in the first week after roster publish. The process
+          was manual, slow, and crew satisfaction suffered.
+        </div>
+      </div>
+      <div class="ds2-problem-cards">
+        <div class="ds2-problem-card">
+          <div class="ds2-problem-num">40</div>
+          <div>
+            <div class="ds2-problem-title">Controller Hours Consumed</div>
+            <div class="ds2-problem-desc">40% of controller working hours spent on manual duty-swap processing during the 7-day peak window after roster publish.</div>
+          </div>
+        </div>
+        <div class="ds2-problem-card">
+          <div class="ds2-problem-num">60</div>
+          <div>
+            <div class="ds2-problem-title">Success Rate Ceiling</div>
+            <div class="ds2-problem-desc">Manual legality checks only at Crew A submission and Crew B response — leaving a hard ceiling of 40–60% success with no path to improve.</div>
+          </div>
+        </div>
+        <div class="ds2-problem-card">
+          <div class="ds2-problem-num">7</div>
+          <div>
+            <div class="ds2-problem-title">Day Peak Overload</div>
+            <div class="ds2-problem-desc">Only ~200 successful cases in the first 7 days — controllers overwhelmed, crew waiting, productivity lost network-wide.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIVIDER -->
+  <div class="ds2-divider"><span class="ds2-divider-diamond">◆</span></div>
+
+  <!-- SECTION 02 — HOW IT WORKS -->
+  <div class="ds2-section ds2-section--tint">
+    <div class="ds2-eyebrow">02 · The Solution</div>
+    <div class="ds2-title ds2-title--center">The Automated Flow</div>
+    <div class="ds2-lead ds2-lead--center">
+      Four steps. Zero controller touchpoints for the majority of swaps.
+      Full legality validation at every checkpoint.
+    </div>
+    <div class="ds2-flow">
+      <div class="ds2-flow-step">
+        <div class="ds2-flow-node">⚙</div>
+        <div class="ds2-flow-step-label">Step 01</div>
+        <div class="ds2-flow-title">Controller Setup</div>
+        <div class="ds2-flow-desc">Admin configures eligibility, duty types, open windows, and approval mode once — governs all future swaps.</div>
+      </div>
+      <div class="ds2-flow-step">
+        <div class="ds2-flow-node">👤</div>
+        <div class="ds2-flow-step-label">Step 02</div>
+        <div class="ds2-flow-title">Crew A Submits</div>
+        <div class="ds2-flow-desc">Crew finds a partner, selects duties, and submits — fully self-service through the crew portal.</div>
+      </div>
+      <div class="ds2-flow-step">
+        <div class="ds2-flow-node">⚡</div>
+        <div class="ds2-flow-step-label">Step 03</div>
+        <div class="ds2-flow-title">iROS Validates</div>
+        <div class="ds2-flow-desc">Real-time FTL, rest, and qualification checks for every step — not just submission.</div>
+      </div>
+      <div class="ds2-flow-step">
+        <div class="ds2-flow-node">✅</div>
+        <div class="ds2-flow-step-label">Step 04</div>
+        <div class="ds2-flow-title">Award &amp; Notify</div>
+        <div class="ds2-flow-desc">Duties swapped automatically. Both crew notified by push. Full audit trail recorded instantly.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIVIDER -->
+  <div class="ds2-divider" style="background:var(--ta-bg-tint);"><span class="ds2-divider-diamond">◆</span></div>
+
+  <!-- SECTION 03 — CONTROLLER SETUP -->
+  <div class="ds2-section">
+    <div class="ds2-eyebrow">03 · Admin Configuration</div>
+    <div class="ds2-two-col">
+      <div class="ds2-screenshot-frame">
+        <div class="ds2-chrome-bar">
+          <div class="ds2-dots"><span class="ds2-dot"></span><span class="ds2-dot"></span><span class="ds2-dot"></span></div>
+          <div class="ds2-url">crew-sea-test.roiscloud.com · Request Setting</div>
+        </div>
+        <img src="images/dutyswap/image1.png" class="ds2-img" alt="Controller Setup — Request Setting UI" loading="lazy">
+        <div class="ds2-caption">Request Setting · Eligibility, duty types, submission windows</div>
+      </div>
+      <div>
+        <div class="ds2-title">Flexible Admin Control</div>
+        <div class="ds2-lead">Define exactly who can swap, what, and when — with a single configuration that governs the entire automated lifecycle.</div>
+        <div class="ds2-features">
+          <div class="ds2-feature">
+            <div class="ds2-feature-title">Crew Eligibility</div>
+            <div class="ds2-feature-desc">Define which crew are eligible based on rank, base, qualifications, and seniority rules.</div>
+          </div>
+          <div class="ds2-feature">
+            <div class="ds2-feature-title">Duty Type Control</div>
+            <div class="ds2-feature-desc">Configure which duty types can be swapped — flight duties, standby, ground duties, and restrictions.</div>
+          </div>
+          <div class="ds2-feature">
+            <div class="ds2-feature-title">Open Window Control</div>
+            <div class="ds2-feature-desc">Set when crew can submit swap requests relative to the duty date and roster publish date.</div>
+          </div>
+          <div class="ds2-feature">
+            <div class="ds2-feature-title">Legality Engine</div>
+            <div class="ds2-feature-desc">Real-time FTL, rest, and qualification validation embedded at every step — not just at submission.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIVIDER -->
+  <div class="ds2-divider"><span class="ds2-divider-diamond">◆</span></div>
+
+  <!-- SECTION 04 — AWARDING ENGINE -->
+  <div class="ds2-section ds2-section--tint">
+    <div class="ds2-eyebrow">04 · Awarding Logic</div>
+    <div class="ds2-two-col ds2-two-col--flip">
+      <div class="ds2-screenshot-frame">
+        <div class="ds2-chrome-bar">
+          <div class="ds2-dots"><span class="ds2-dot"></span><span class="ds2-dot"></span><span class="ds2-dot"></span></div>
+          <div class="ds2-url">crew-sea-test.roiscloud.com · Approval Setting</div>
+        </div>
+        <img src="images/dutyswap/image2.png" class="ds2-img" alt="Awarding Engine — Approval Setting UI" loading="lazy">
+        <div class="ds2-caption">Approval Setting · Auto mode, effective period, max approvals per phase</div>
+      </div>
+      <div>
+        <div class="ds2-title">Intelligent Awarding</div>
+        <div class="ds2-lead">Configure the awarding rules that run automatically — or choose semi-automatic mode for exceptional cases.</div>
+        <div class="ds2-features">
+          <div class="ds2-feature">
+            <div class="ds2-feature-title">Swap Rules Engine</div>
+            <div class="ds2-feature-desc">Seniority-based, first-come-first-served, or custom weighted priority — all configurable without code changes.</div>
+          </div>
+          <div class="ds2-feature">
+            <div class="ds2-feature-title">Approval Mode</div>
+            <div class="ds2-feature-desc">Fully automatic, semi-automatic with controller review, or manual approval per duty type and phase.</div>
+          </div>
+          <div class="ds2-feature">
+            <div class="ds2-feature-title">Award Analytics</div>
+            <div class="ds2-feature-desc">Monitor award rates, rejection reasons, and processing efficiency in real time via the controller dashboard.</div>
+          </div>
+          <div class="ds2-feature">
+            <div class="ds2-feature-title">Notification Rules</div>
+            <div class="ds2-feature-desc">Automated push, SMS, or email notifications at each stage — configured per airline preference.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIVIDER -->
+  <div class="ds2-divider" style="background:var(--ta-bg-tint);"><span class="ds2-divider-diamond">◆</span></div>
+
+  <!-- SECTION 05 — CREW PORTAL -->
+  <div class="ds2-section">
+    <div class="ds2-eyebrow">05 · Crew Experience</div>
+    <div class="ds2-title ds2-title--center">The Crew Portal</div>
+    <div class="ds2-lead ds2-lead--center">A fully self-service mobile portal — PDPA compliant, anonymous search, real-time legality feedback at every step.</div>
+
+    <div class="ds2-crew-steps">
+      <!-- 5.1 Login -->
+      <div class="ds2-crew-step">
+        <div class="ds2-crew-step-header">
+          <span class="ds2-crew-step-badge">Step 5.1</span>
+          <span class="ds2-crew-step-title">Login</span>
+        </div>
+        <div class="ds2-crew-step-desc">Crew authenticates via Employee ID. PDPA-compliant session — encrypted in transit, no personal data retained beyond the session.</div>
+        <div class="ds2-screenshot-frame ds2-crew-img-full">
+          <div class="ds2-chrome-bar">
+            <div class="ds2-dots"><span class="ds2-dot"></span><span class="ds2-dot"></span><span class="ds2-dot"></span></div>
+            <div class="ds2-url">crew-sea-test.roiscloud.com/tg/portal/login</div>
+          </div>
+          <img src="images/dutyswap/image3.png" class="ds2-img" alt="Crew Portal Login" loading="lazy">
+          <div class="ds2-caption">Login · Employee ID authentication · PDPA compliant</div>
+        </div>
+      </div>
+
+      <!-- 5.2 Roster -->
+      <div class="ds2-crew-step">
+        <div class="ds2-crew-step-header">
+          <span class="ds2-crew-step-badge">Step 5.2</span>
+          <span class="ds2-crew-step-title">My Roster</span>
+        </div>
+        <div class="ds2-crew-step-desc">Crew sees their full published roster for the bid month — flights, layovers, duty hours, and standby. The foundation for choosing which duties to publish for swap.</div>
+        <div class="ds2-screenshot-frame ds2-crew-img-full">
+          <div class="ds2-chrome-bar">
+            <div class="ds2-dots"><span class="ds2-dot"></span><span class="ds2-dot"></span><span class="ds2-dot"></span></div>
+            <div class="ds2-url">portal/page/roster · March 2026</div>
+          </div>
+          <img src="images/dutyswap/image4.png" class="ds2-img" alt="My Roster view" loading="lazy">
+          <div class="ds2-caption">Landing Page · Roster view with flights, layovers, daily duty hours</div>
+        </div>
+      </div>
+
+      <!-- 5.3 PDPA / Publish -->
+      <div class="ds2-crew-step">
+        <div class="ds2-crew-step-header">
+          <span class="ds2-crew-step-badge">Step 5.3</span>
+          <span class="ds2-crew-step-title">Publish Duty</span>
+        </div>
+        <div class="ds2-crew-step-desc">Crew publishes duties they wish to swap. Roster data is classified as private under PDPA — published duties are shown anonymously to other crew.</div>
+        <div class="ds2-crew-side">
+          <div class="ds2-screenshot-frame">
+            <div class="ds2-chrome-bar">
+              <div class="ds2-dots"><span class="ds2-dot"></span><span class="ds2-dot"></span><span class="ds2-dot"></span></div>
+              <div class="ds2-url">PDPA · Privacy by Design</div>
+            </div>
+            <img src="images/dutyswap/image5.png" class="ds2-img" alt="PDPA privacy illustration" loading="lazy">
+            <div class="ds2-caption">PDPA · Roster classified as private personal data</div>
+          </div>
+          <div class="ds2-pdpa-points">
+            <div class="ds2-pdpa-point">Roster is private data under PDPA — never shared without explicit crew consent</div>
+            <div class="ds2-pdpa-point">Crew chooses which duties to publish — full ownership retained at all times</div>
+            <div class="ds2-pdpa-point">Published duties shown anonymously — no name, ID, or rank visible to other crew</div>
+            <div class="ds2-pdpa-point">Audit log for every publish and unpublish action maintained for compliance</div>
+            <div class="ds2-pdpa-point">Crew can withdraw a published duty at any time before a swap is awarded</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5.4 Search -->
+      <div class="ds2-crew-step">
+        <div class="ds2-crew-step-header">
+          <span class="ds2-crew-step-badge">Step 5.4</span>
+          <span class="ds2-crew-step-title">Search Swaps</span>
+        </div>
+        <div class="ds2-crew-step-desc">Search compatible swap candidates using multiple filters — date range, CRD, BLH, flight end, layover port. All results shown anonymously.</div>
+        <div class="ds2-screenshot-frame ds2-crew-img-full">
+          <div class="ds2-chrome-bar">
+            <div class="ds2-dots"><span class="ds2-dot"></span><span class="ds2-dot"></span><span class="ds2-dot"></span></div>
+            <div class="ds2-url">portal/page/pbs/duty-swap · Search Pairing</div>
+          </div>
+          <img src="images/dutyswap/image6.png" class="ds2-img" alt="Search Pairing" loading="lazy">
+          <div class="ds2-caption">Search Pairing · Date range, CRD, BLH, layover port filters · anonymous results</div>
+        </div>
+      </div>
+
+      <!-- 5.5 Select & Confirm -->
+      <div class="ds2-crew-step">
+        <div class="ds2-crew-step-header">
+          <span class="ds2-crew-step-badge">Step 5.5</span>
+          <span class="ds2-crew-step-title">Select &amp; Confirm</span>
+        </div>
+        <div class="ds2-crew-step-desc">Select duties and review a side-by-side FDP/BLH comparison, then submit. iROS validates legality and awards the swap instantly.</div>
+        <div class="ds2-dual-imgs">
+          <div class="ds2-screenshot-frame">
+            <div class="ds2-chrome-bar">
+              <div class="ds2-dots"><span class="ds2-dot"></span><span class="ds2-dot"></span><span class="ds2-dot"></span></div>
+              <div class="ds2-url">duty-swap · Step 2 — Select Duty</div>
+            </div>
+            <img src="images/dutyswap/image7.png" class="ds2-img" alt="Select Duties" loading="lazy">
+            <div class="ds2-caption">Step 2 · Select duties from Mine and Others' rosters</div>
+          </div>
+          <div class="ds2-screenshot-frame">
+            <div class="ds2-chrome-bar">
+              <div class="ds2-dots"><span class="ds2-dot"></span><span class="ds2-dot"></span><span class="ds2-dot"></span></div>
+              <div class="ds2-url">duty-swap · Step 3 — Submit</div>
+            </div>
+            <img src="images/dutyswap/image8.png" class="ds2-img" alt="Submit Swap" loading="lazy">
+            <div class="ds2-caption">Step 3 · FDP/BLH verified · Submit for instant award</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIVIDER -->
+  <div class="ds2-divider"><span class="ds2-divider-diamond">◆</span></div>
+
+  <!-- SECTION 06 — CONTROLLER VIEW -->
+  <div class="ds2-section ds2-section--tint">
+    <div class="ds2-eyebrow">06 · Operations</div>
+    <div class="ds2-two-col">
+      <div>
+        <div class="ds2-title">Full Queue Visibility</div>
+        <div class="ds2-lead">Controllers see everything — with override capability for the rare exception. The queue runs itself.</div>
+        <div class="ds2-stat-trio">
+          <div class="ds2-stat-row-item">
+            <div class="ds2-stat-num">184</div>
+            <div class="ds2-stat-label">Total Requests</div>
+          </div>
+          <div class="ds2-stat-row-item">
+            <div class="ds2-stat-num" style="color:#16a34a;">143</div>
+            <div class="ds2-stat-label">Auto Approved</div>
+          </div>
+          <div class="ds2-stat-row-item">
+            <div class="ds2-stat-num" style="color:#b45309;">12</div>
+            <div class="ds2-stat-label">Unsuccessful</div>
+          </div>
+        </div>
+        <div class="ds2-bullets">
+          <div class="ds2-bullet">Majority of swaps auto-awarded — zero controller action required</div>
+          <div class="ds2-bullet">Real-time legality check at every step of the process</div>
+          <div class="ds2-bullet">All crew identities masked in portal — PDPA compliant end-to-end</div>
+          <div class="ds2-bullet">Both crew notified by push immediately upon award</div>
+          <div class="ds2-bullet">Full audit trail — time, crew IDs, status, approver recorded</div>
+        </div>
+      </div>
+      <div class="ds2-screenshot-frame">
+        <div class="ds2-chrome-bar">
+          <div class="ds2-dots"><span class="ds2-dot"></span><span class="ds2-dot"></span><span class="ds2-dot"></span></div>
+          <div class="ds2-url">Duty Swap Request · Controller Management View</div>
+        </div>
+        <img src="images/dutyswap/image9.png" class="ds2-img" alt="Controller Management" loading="lazy">
+        <div class="ds2-caption">Controller View · Filter, review, approve or reject per request</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 07 — IMPACT (dark gradient) -->
+  <div class="ds2-section ds2-section--dark">
+    <div class="ds2-impact-title-wrap">
+      <div class="ds2-eyebrow ds2-eyebrow--light" style="justify-content:center;">07 · Measured Results</div>
+      <div class="ds2-title ds2-title--center ds2-title--light">The Transformation</div>
+      <div class="ds2-lead ds2-lead--center ds2-lead--light">Every metric improved — legality, throughput, automation rate, crew satisfaction, controller workload.</div>
+    </div>
+    <div class="ds2-impact-grid">
+      <div class="ds2-impact-cell">
+        <div class="ds2-impact-num">75–90%</div>
+        <div class="ds2-impact-rule"></div>
+        <div class="ds2-impact-unit">Success Rate</div>
+        <div class="ds2-impact-before">was 40–60%</div>
+      </div>
+      <div class="ds2-impact-cell">
+        <div class="ds2-impact-num">1,300</div>
+        <div class="ds2-impact-rule"></div>
+        <div class="ds2-impact-unit">Cases · Day One</div>
+        <div class="ds2-impact-before">was ~200 in 7 days</div>
+      </div>
+      <div class="ds2-impact-cell">
+        <div class="ds2-impact-num">&lt;10%</div>
+        <div class="ds2-impact-rule"></div>
+        <div class="ds2-impact-unit">Controller Hours</div>
+        <div class="ds2-impact-before">was 40% in 7-day peak</div>
+      </div>
+      <div class="ds2-impact-cell">
+        <div class="ds2-impact-num" style="font-size:clamp(22px,2.8vw,34px);letter-spacing:0;">FULL AUTO</div>
+        <div class="ds2-impact-rule"></div>
+        <div class="ds2-impact-unit">Awarding Mode</div>
+        <div class="ds2-impact-before">was 100% manual</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="ds2-footer">
+    <span class="ds2-footer-text">ROIs Crew Intelligence · Duty Swap Module · Thai Airways × ROIs · 2026</span>
+    <span class="ds2-footer-orchid">✿ ✿ ✿</span>
+  </div>
+
+</div><!-- /ds2-wrap -->

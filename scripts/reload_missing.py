@@ -21,15 +21,20 @@ from datetime import datetime
 
 # ── Config ────────────────────────────────────────────────────────────────────
 SQL_FILE    = os.path.expanduser("~/rois_tg_live_load/rois_tg_live_prod.sql")
-EXCLUDED    = os.path.expanduser("~/Royce-Homekit/scripts/excluded_tables.txt")
+REPO_DIR    = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+EXCLUDED    = os.path.join(REPO_DIR, "scripts/excluded_tables.txt")
 DB          = "rois_tg_live_prod"
 MYSQL_USER  = "root"
 MYSQL_PASS  = "R@iscrew2026"
 BATCH_SIZE  = 5000          # rows per INSERT batch
-LOG_FILE    = os.path.expanduser("~/Royce-Homekit/logs_data/reload_missing.log")
-REPORT_FILE = os.path.expanduser("~/Royce-Homekit/logs_data/COMPARISON_REPORT.txt")
+LOG_FILE    = os.path.join(REPO_DIR, "logs_data/reload_missing.log")
+REPORT_FILE = os.path.join(REPO_DIR, "logs_data/COMPARISON_REPORT.txt")
 DRY_RUN     = "--dry-run"    in sys.argv
 REPORT_ONLY = "--report-only" in sys.argv
+
+# --table <name>  →  force-load exactly one table regardless of its current state
+_table_arg = next((sys.argv[i+1] for i, a in enumerate(sys.argv) if a == "--table" and i+1 < len(sys.argv)), None)
+FORCE_TABLE = _table_arg
 
 def mysql_cmd():
     return ["mysql", f"-u{MYSQL_USER}", f"-p{MYSQL_PASS}", DB]
@@ -255,6 +260,11 @@ def main():
         # ... would need SQL row counts separately
         log("Report-only mode not fully implemented without SQL counts; run without --report-only")
         return
+
+    # --table override: force exactly one table regardless of DB state
+    if FORCE_TABLE:
+        log(f"--table override: forcing load of '{FORCE_TABLE}'")
+        target_tables = {FORCE_TABLE: "reload"}
 
     if not target_tables:
         log("No tables to reload. Generating comparison report...")

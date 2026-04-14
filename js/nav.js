@@ -24,7 +24,8 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-document.getElementById('init-time').textContent = new Date().toUTCString().split(' ')[4];
+const _initTime = document.getElementById('init-time');
+if (_initTime) _initTime.textContent = new Date().toUTCString().split(' ')[4];
 
 // ===================================================================
 // NAV
@@ -33,11 +34,14 @@ const breadcrumbs = {
   bids:      'BIDS TYPE ANALYSIS',
   converter: 'PDF → EXCEL CONVERTER',
   loadsql:   'LOAD SQL INTO DB',
+  nbids:     'N-BIDS REFORMAT',
   dashboard: 'DASHBOARD',
   about:     'ABOUT US',
   client:    'ABOUT CLIENT',
   model:     'ABOUT MODEL',
-  roadmap:   'ABOUT ROADMAP'
+  roadmap:   'ABOUT ROADMAP',
+  dutyswap:  'DUTY SWAP DEMO',
+  dutyswap2: 'DUTY SWAP II'
 };
 
 // ===================================================================
@@ -64,11 +68,12 @@ async function showPage(id) {
 
   // Set active nav
   const navItems = document.querySelectorAll('.nav-item');
-  const labels = {bids:'Bids Type Analysis', converter:'PDF → Excel Converter', loadsql:'Load SQL into DB', dashboard:'Dashboard', about:'Us', client:'Client', model:'Model', roadmap:'Roadmap'};
+  const labels = {bids:'Bids Type Analysis', converter:'PDF → Excel Converter', loadsql:'Load SQL into DB', nbids:'N-Bids Reformat', dashboard:'Dashboard', about:'Us', client:'Client', model:'Model', roadmap:'Roadmap', dutyswap:'Duty Swap', dutyswap2:'Duty Swap II'};
   navItems.forEach(item => {
     const label = item.querySelector('.nav-label');
     if (label && label.textContent.trim() === labels[id]) {
       item.classList.add('active');
+      item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   });
 
@@ -79,6 +84,18 @@ async function showPage(id) {
   if (id === 'client') setTimeout(initClientMap, 50);
   if (id === 'model')   setTimeout(initModelPage,   50);
   if (id === 'roadmap') setTimeout(initRoadmapPage, 50);
+  if (id === 'nbids')   setTimeout(initNbidsPage,   50);
+}
+
+// ===================================================================
+// SUBMENU TOGGLE
+// ===================================================================
+function toggleNavSubmenu(key) {
+  const sm     = document.getElementById('submenu-' + key);
+  const parent = document.getElementById('nav-' + key + '-parent');
+  if (!sm) return;
+  const isOpen = sm.classList.toggle('open');
+  if (parent) parent.classList.toggle('submenu-open', isOpen);
 }
 
 // ===================================================================
@@ -101,6 +118,9 @@ function updateThemeUI(theme) {
   if (icon)  icon.innerHTML    = theme === 'light' ? _moonSVG : _sunSVG;
   if (badge) badge.textContent = theme === 'light' ? 'LIGHT' : 'DARK';
 }
+
+// Load dashboard content on startup
+document.addEventListener('DOMContentLoaded', () => loadPageIfNeeded('dashboard'));
 
 // Auto-apply saved theme on load
 (function() {

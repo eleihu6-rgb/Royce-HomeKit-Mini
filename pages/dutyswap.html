@@ -1,0 +1,1196 @@
+<style>
+/* ===== DUTY SWAP — Editorial Dark Aviation ===== */
+
+/* ── Color tokens ── */
+:root {
+  --ds-orchid:   167, 139, 250;
+  --ds-gold:     251, 191,  36;
+  --ds-green:     74, 222, 128;
+  --ds-red:      248, 113, 113;
+}
+
+#ds-wrap { min-height: 100vh; background: var(--bg-void); }
+
+/* ────────────────────────────────────────────────
+   HERO — editorial, left-anchored, type-as-texture
+   ──────────────────────────────────────────────── */
+.ds-hero {
+  position: relative;
+  background: #0d0015;
+  padding: 64px 56px 52px;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(var(--ds-orchid), 0.12);
+}
+
+/* Giant background label — texture, not decoration */
+.ds-hero::before {
+  content: 'DUTY SWAP';
+  position: absolute;
+  right: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(80px, 12vw, 160px);
+  font-weight: 700;
+  letter-spacing: -4px;
+  color: rgba(var(--ds-orchid), 0.05);
+  line-height: 1;
+  pointer-events: none;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Thin accent rule on the left */
+.ds-hero::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, rgba(var(--ds-orchid),0) 0%, rgba(var(--ds-orchid),0.8) 40%, rgba(var(--ds-gold),0.6) 70%, rgba(var(--ds-orchid),0) 100%);
+}
+
+.ds-hero-eyebrow {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: rgba(220, 210, 255, 0.85);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ds-hero-eyebrow-line {
+  display: inline-block;
+  width: 32px;
+  height: 1px;
+  background: rgba(var(--ds-orchid), 0.4);
+}
+
+.ds-hero-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -1px;
+  line-height: 1.05;
+}
+.ds-hero-title em {
+  font-style: normal;
+  color: rgba(var(--ds-gold), 1);
+}
+
+.ds-hero-subtitle {
+  margin-top: 14px;
+  font-size: 13px;
+  color: rgba(250,250,250,0.72);
+  letter-spacing: 0.2px;
+  max-width: 480px;
+  line-height: 1.8;
+}
+
+/* Stat bar — replaces generic badge pills */
+.ds-hero-stats {
+  margin-top: 36px;
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+}
+.ds-hero-stat {
+  padding: 0 32px 0 0;
+  border-right: 1px solid rgba(var(--ds-orchid), 0.15);
+  margin-right: 32px;
+}
+.ds-hero-stat:last-child {
+  border-right: none;
+  margin-right: 0;
+}
+.ds-hero-stat-val {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+  letter-spacing: -1px;
+}
+.ds-hero-stat-val small {
+  font-size: 18px;
+  font-weight: 600;
+  color: rgba(var(--ds-gold), 0.9);
+}
+.ds-hero-stat-lbl {
+  margin-top: 4px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  color: rgba(250,250,250,0.6);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* ────────────────────────────────────────────────
+   TAB NAV — sharper active state
+   ──────────────────────────────────────────────── */
+.ds-tabs {
+  display: flex;
+  align-items: stretch;
+  background: rgba(10, 8, 18, 0.95);
+  border-bottom: 1px solid rgba(var(--ds-orchid), 0.1);
+  padding: 0 56px;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.ds-tabs::-webkit-scrollbar { display: none; }
+
+.ds-tab {
+  padding: 16px 20px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(250,250,250,0.55);
+  letter-spacing: 0.8px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.2s var(--ease-smooth), border-color 0.2s var(--ease-smooth), background 0.2s var(--ease-smooth);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  top: 1px;
+  outline: none;
+  text-transform: uppercase;
+}
+.ds-tab:hover {
+  color: rgba(250,250,250,0.65);
+  border-bottom-color: rgba(var(--ds-orchid), 0.25);
+  background: rgba(var(--ds-orchid), 0.03);
+}
+.ds-tab:focus-visible {
+  color: rgba(var(--ds-orchid), 1);
+  border-bottom-color: rgba(var(--ds-orchid), 0.5);
+}
+.ds-tab.active {
+  color: #fff;
+  border-bottom-color: rgba(var(--ds-gold), 1);
+  background: rgba(var(--ds-gold), 0.04);
+}
+.ds-tab-num {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  background: rgba(var(--ds-orchid), 0.1);
+  font-size: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(250,250,250,0.5);
+  font-family: 'Share Tech Mono', monospace;
+  flex-shrink: 0;
+  letter-spacing: 0;
+}
+.ds-tab.active .ds-tab-num {
+  background: rgba(var(--ds-gold), 0.2);
+  color: rgba(var(--ds-gold), 1);
+}
+
+/* ────────────────────────────────────────────────
+   SUB-PAGE entrance animation
+   ──────────────────────────────────────────────── */
+@keyframes dsSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ds-subpage { display: none; padding: 44px 56px 64px; }
+.ds-subpage.active {
+  display: block;
+  animation: dsSlideUp 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-subpage.active { animation: none; }
+}
+
+/* ────────────────────────────────────────────────
+   SECTION HEADER — editorial callout style
+   ──────────────────────────────────────────────── */
+.ds-section-header { margin-bottom: 40px; }
+
+.ds-section-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  color: rgba(220, 210, 255, 0.85);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ds-section-label::after {
+  content: '';
+  flex: 1;
+  max-width: 80px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(var(--ds-orchid), 0.3), transparent);
+}
+
+.ds-section-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(22px, 3vw, 32px);
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 1px;
+  line-height: 1.05;
+}
+
+/* Left-border callout — replaces generic purple box */
+.ds-section-goal {
+  margin-top: 14px;
+  padding: 14px 20px;
+  border-left: 3px solid rgba(var(--ds-orchid), 0.5);
+  background: rgba(var(--ds-orchid), 0.03);
+  max-width: 660px;
+}
+.ds-section-goal-text {
+  font-size: 13px;
+  color: rgba(250,250,250,0.75);
+  line-height: 1.75;
+}
+.ds-section-goal-text strong { color: rgba(250,250,250,0.85); font-weight: 600; }
+
+/* ────────────────────────────────────────────────
+   ROLE MATRIX TABLE — Sub-Page 1
+   ──────────────────────────────────────────────── */
+.ds-role-table-wrap {
+  overflow-x: auto;
+  border-radius: 4px;
+  border: 1px solid rgba(var(--ds-orchid), 0.1);
+  background: rgba(20, 20, 28, 0.5);
+}
+.ds-role-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+.ds-role-table thead tr {
+  background: rgba(var(--ds-orchid), 0.07);
+  border-bottom: 1px solid rgba(var(--ds-orchid), 0.15);
+}
+.ds-role-table thead th {
+  padding: 14px 20px;
+  text-align: left;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(220, 210, 255, 0.9);
+  white-space: nowrap;
+}
+.ds-role-table thead th:first-child {
+  width: 44px;
+  text-align: center;
+  color: rgba(250,250,250,0.4);
+}
+.ds-role-table tbody tr {
+  border-bottom: 1px solid rgba(var(--ds-orchid), 0.06);
+  transition: background 0.15s;
+}
+.ds-role-table tbody tr:last-child { border-bottom: none; }
+.ds-role-table tbody tr:hover { background: rgba(var(--ds-orchid), 0.035); }
+.ds-role-table td {
+  padding: 18px 20px;
+  font-size: 12px;
+  color: rgba(250,250,250,0.72);
+  line-height: 1.55;
+  vertical-align: top;
+}
+.ds-role-table td:first-child {
+  text-align: center;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: rgba(250,250,250,0.45);
+  font-weight: 600;
+  width: 44px;
+}
+.ds-role-cell { display: flex; flex-direction: column; gap: 4px; }
+.ds-role-action {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: rgba(250,250,250,0.85);
+  font-weight: 500;
+}
+.ds-role-action-icon { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+.ds-role-sub {
+  font-size: 10px;
+  color: rgba(250,250,250,0.55);
+  padding-left: 21px;
+  font-family: 'Share Tech Mono', monospace;
+  letter-spacing: 0.5px;
+}
+.ds-cell-empty {
+  width: 16px; height: 16px;
+  border-radius: 3px;
+  border: 1px dashed rgba(var(--ds-orchid), 0.1);
+  margin: auto;
+}
+td.ds-highlight-system { background: rgba(var(--ds-orchid), 0.04); }
+td.ds-highlight-crewa  { background: rgba(var(--ds-gold), 0.03); }
+td.ds-highlight-crewb  { background: rgba(var(--ds-green), 0.03); }
+
+/* ────────────────────────────────────────────────
+   GOAL CARDS — editorial numbered list (Sub-Pages 2, 3)
+   no more generic card boxes
+   ──────────────────────────────────────────────── */
+.ds-goal-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 0;
+  margin-top: 32px;
+  border-top: 1px solid rgba(var(--ds-orchid), 0.1);
+}
+.ds-goal-card {
+  padding: 28px 32px 28px 0;
+  border-bottom: 1px solid rgba(var(--ds-orchid), 0.08);
+  border-right: 1px solid rgba(var(--ds-orchid), 0.08);
+  position: relative;
+  transition: background 0.2s var(--ease-smooth);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.ds-goal-card:hover { background: rgba(var(--ds-orchid), 0.025); }
+
+/* Left accent line on hover */
+.ds-goal-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: rgba(var(--ds-gold), 0.8);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.2s var(--ease-smooth);
+}
+.ds-goal-card:hover::before { transform: scaleY(1); }
+
+/* Remove the old icon element — replaced by large counter */
+.ds-goal-card-icon { display: none; }
+
+.ds-goal-card-num {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 48px;
+  font-weight: 700;
+  color: rgba(var(--ds-orchid), 0.12);
+  line-height: 1;
+  margin-bottom: 8px;
+  padding-left: 32px;
+  letter-spacing: -2px;
+}
+.ds-goal-card-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: rgba(250,250,250,0.9);
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+  padding-left: 32px;
+}
+.ds-goal-card-desc {
+  font-size: 12px;
+  color: rgba(250,250,250,0.65);
+  line-height: 1.75;
+  padding-left: 32px;
+}
+
+/* ────────────────────────────────────────────────
+   SUB-PAGE 4: Crew Portal Carousel
+   ──────────────────────────────────────────────── */
+.ds-carousel-wrap { position: relative; }
+
+.ds-carousel-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.ds-carousel-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.ds-carousel-pill {
+  padding: 6px 16px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-family: 'Share Tech Mono', monospace;
+  font-weight: 400;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px solid rgba(var(--ds-orchid), 0.25);
+  color: rgba(250,250,250,0.6);
+  background: transparent;
+  transition: border-color 0.2s var(--ease-smooth), color 0.2s var(--ease-smooth), background 0.2s var(--ease-smooth);
+  white-space: nowrap;
+  outline: none;
+}
+.ds-carousel-pill:hover {
+  border-color: rgba(var(--ds-orchid), 0.4);
+  color: rgba(250,250,250,0.7);
+}
+.ds-carousel-pill:focus-visible {
+  border-color: rgba(var(--ds-orchid), 0.7);
+  color: rgba(var(--ds-orchid), 1);
+}
+.ds-carousel-pill.active {
+  background: rgba(var(--ds-gold), 0.1);
+  border-color: rgba(var(--ds-gold), 0.6);
+  color: rgba(var(--ds-gold), 1);
+}
+
+.ds-carousel-arrows { display: flex; gap: 8px; }
+.ds-arrow-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(var(--ds-orchid), 0.25);
+  color: rgba(250,250,250,0.65);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s var(--ease-smooth), border-color 0.2s var(--ease-smooth), color 0.2s var(--ease-smooth);
+  outline: none;
+}
+.ds-arrow-btn:hover {
+  background: rgba(var(--ds-orchid), 0.12);
+  border-color: rgba(var(--ds-orchid), 0.5);
+  color: rgba(var(--ds-orchid), 1);
+}
+.ds-arrow-btn:focus-visible {
+  border-color: rgba(var(--ds-orchid), 0.8);
+  box-shadow: 0 0 0 2px rgba(var(--ds-orchid), 0.2);
+}
+.ds-arrow-btn:disabled { opacity: 0.2; cursor: default; }
+
+.ds-child-pages { position: relative; }
+.ds-child-page  { display: none; }
+.ds-child-page.active { display: block; }
+
+/* PDPA two-col layout */
+.ds-pdpa-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+@media (max-width: 900px) { .ds-pdpa-grid { grid-template-columns: 1fr; } }
+
+/* Bullet list */
+.ds-bullet-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.ds-bullet-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  font-size: 12px;
+  color: rgba(250,250,250,0.72);
+  line-height: 1.7;
+}
+.ds-bullet-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 3px;
+  background: rgba(var(--ds-orchid), 0.1);
+  border: 1px solid rgba(var(--ds-orchid), 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ────────────────────────────────────────────────
+   SUB-PAGE 5: Controller View
+   ──────────────────────────────────────────────── */
+
+/* Stat row — large display typography, no boxes */
+.ds-stat-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0;
+  margin-bottom: 40px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid rgba(var(--ds-orchid), 0.08);
+}
+.ds-stat-box {
+  padding-right: 40px;
+  margin-right: 40px;
+  border-right: 1px solid rgba(var(--ds-orchid), 0.1);
+}
+.ds-stat-box:last-child {
+  border-right: none;
+  margin-right: 0;
+}
+.ds-stat-val {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(44px, 5vw, 64px);
+  font-weight: 700;
+  color: rgba(250,250,250,0.9);
+  line-height: 1;
+  letter-spacing: -2px;
+}
+.ds-stat-lbl {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  color: rgba(250,250,250,0.6);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+/* Controller panel */
+.ds-ctrl-panel {
+  background: rgba(20,20,28,0.5);
+  border: 1px solid rgba(var(--ds-orchid), 0.1);
+  border-radius: 4px;
+  overflow: clip;
+}
+.ds-ctrl-panel-hdr {
+  padding: 12px 20px;
+  background: rgba(var(--ds-orchid), 0.06);
+  border-bottom: 1px solid rgba(var(--ds-orchid), 0.1);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  color: rgba(220, 210, 255, 0.9);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+.ds-ctrl-panel-body { padding: 20px 20px 24px; }
+
+/* ────────────────────────────────────────────────
+   VALUE MEASUREMENT TABLE — Sub-Page 6
+   ──────────────────────────────────────────────── */
+.ds-value-table-wrap {
+  overflow-x: auto;
+  border-radius: 4px;
+  border: 1px solid rgba(var(--ds-orchid), 0.1);
+  background: rgba(20,20,28,0.5);
+  backdrop-filter: blur(10px);
+}
+.ds-value-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+}
+.ds-value-table thead tr {
+  background: rgba(var(--ds-orchid), 0.07);
+  border-bottom: 1px solid rgba(var(--ds-orchid), 0.15);
+}
+.ds-value-table thead th {
+  padding: 14px 24px;
+  text-align: left;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(220, 210, 255, 0.9);
+}
+.ds-value-table thead th:first-child { width: 180px; }
+.ds-value-table tbody tr {
+  border-bottom: 1px solid rgba(var(--ds-orchid), 0.06);
+  transition: background 0.15s;
+}
+.ds-value-table tbody tr:last-child { border-bottom: none; }
+.ds-value-table tbody tr:hover { background: rgba(var(--ds-orchid), 0.025); }
+.ds-value-table td {
+  padding: 18px 24px;
+  font-size: 13px;
+  color: rgba(250,250,250,0.72);
+  line-height: 1.6;
+  vertical-align: middle;
+}
+.ds-value-table td:first-child {
+  color: rgba(250,250,250,0.85);
+  font-weight: 500;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-right: 1px solid rgba(var(--ds-orchid), 0.08);
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0;
+}
+.ds-val-dim-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+/* Before: dimmed neutral — no red alarm, just "old state" */
+.ds-before { color: rgba(250,250,250,0.45); }
+
+/* After: green only — one semantic color for improvement */
+.ds-after  { color: rgba(var(--ds-green), 0.9); font-weight: 500; }
+
+/* Numbers: same line-height as body, slightly larger but won't blow row height */
+.ds-val-num {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+.ds-val-num.before { color: rgba(250,250,250,0.45); }
+.ds-val-num.after  { color: rgba(var(--ds-green), 0.9); }
+.ds-arrow-up { color: rgba(var(--ds-green), 0.9); font-size: 14px; }
+
+/* Small sub-note inside a cell */
+.ds-val-note {
+  display: block;
+  margin-top: 4px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: rgba(250,250,250,0.45);
+  letter-spacing: 0.3px;
+}
+.ds-val-note.after { color: rgba(var(--ds-green), 0.65); }
+
+/* ────────────────────────────────────────────────
+   SCREENSHOT FRAMES — browser chrome pattern
+   ──────────────────────────────────────────────── */
+.ds-screenshot-showcase { margin-top: 40px; }
+.ds-screenshot-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  color: rgba(250,250,250,0.6);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ds-screenshot-label::before {
+  content: '';
+  width: 20px; height: 1px;
+  background: rgba(var(--ds-orchid), 0.4);
+}
+.ds-screenshot-frame {
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(var(--ds-orchid), 0.12);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,0,0,0.3);
+}
+.ds-screenshot-bar {
+  background: rgba(20,20,28,0.95);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid rgba(var(--ds-orchid), 0.1);
+}
+.ds-screenshot-dots { display: flex; gap: 6px; }
+.ds-screenshot-dot { width: 10px; height: 10px; border-radius: 50%; }
+.ds-screenshot-dot:nth-child(1) { background: rgba(var(--ds-red), 0.8); }
+.ds-screenshot-dot:nth-child(2) { background: rgba(var(--ds-gold), 0.8); }
+.ds-screenshot-dot:nth-child(3) { background: rgba(var(--ds-green), 0.8); }
+.ds-screenshot-url {
+  flex: 1;
+  background: rgba(255,255,255,0.04);
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 4px 12px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  color: rgba(250,250,250,0.6);
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ds-screenshot-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  background: #fff;
+}
+.ds-screenshot-caption {
+  padding: 10px 16px;
+  background: rgba(10,8,18,0.9);
+  font-size: 10px;
+  color: rgba(250,250,250,0.6);
+  font-family: 'Share Tech Mono', monospace;
+  letter-spacing: 0.5px;
+  border-top: 1px solid rgba(var(--ds-orchid), 0.08);
+}
+
+/* Two screenshots side by side */
+.ds-screenshot-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 900px) { .ds-screenshot-pair { grid-template-columns: 1fr; } }
+
+/* Stagger animation for goal cards */
+.ds-goal-cards .ds-goal-card:nth-child(1) { animation-delay: 0.05s; }
+.ds-goal-cards .ds-goal-card:nth-child(2) { animation-delay: 0.10s; }
+.ds-goal-cards .ds-goal-card:nth-child(3) { animation-delay: 0.15s; }
+.ds-goal-cards .ds-goal-card:nth-child(4) { animation-delay: 0.20s; }
+</style>
+
+<div id="ds-wrap">
+
+  <!-- ── HERO ── -->
+  <div class="ds-hero">
+    <div class="ds-hero-eyebrow">
+      <span class="ds-hero-eyebrow-line"></span>
+      Crew Management · AI Automation · ROIs Platform
+    </div>
+    <div class="ds-hero-title">Crew <em>Duty Swap</em><br>Intelligence</div>
+    <div class="ds-hero-subtitle">
+      Automated duty-swap awarding with real-time legality validation —
+      zero controller intervention for the majority of cases.
+    </div>
+    <div class="ds-hero-stats">
+      <div class="ds-hero-stat">
+        <div class="ds-hero-stat-val">4.3<small>K</small></div>
+        <div class="ds-hero-stat-lbl">Active Crew</div>
+      </div>
+      <div class="ds-hero-stat">
+        <div class="ds-hero-stat-val">1,300</div>
+        <div class="ds-hero-stat-lbl">Cases · Day 1</div>
+      </div>
+      <div class="ds-hero-stat">
+        <div class="ds-hero-stat-val">75<small>–90%</small></div>
+        <div class="ds-hero-stat-lbl">Success Rate</div>
+      </div>
+      <div class="ds-hero-stat">
+        <div class="ds-hero-stat-val">&lt;10<small>%</small></div>
+        <div class="ds-hero-stat-lbl">Controller Hours</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB NAVIGATION ── -->
+  <div class="ds-tabs" id="ds-tab-bar">
+    <div class="ds-tab active" onclick="dsShowTab(1)"><span class="ds-tab-num">1</span> Duty Swap Demo</div>
+    <div class="ds-tab" onclick="dsShowTab(2)"><span class="ds-tab-num">2</span> Controller Setup</div>
+    <div class="ds-tab" onclick="dsShowTab(3)"><span class="ds-tab-num">3</span> Awarding Setup</div>
+    <div class="ds-tab" onclick="dsShowTab(4)"><span class="ds-tab-num">4</span> Crew Portal</div>
+    <div class="ds-tab" onclick="dsShowTab(5)"><span class="ds-tab-num">5</span> Controller View</div>
+    <div class="ds-tab" onclick="dsShowTab(6)"><span class="ds-tab-num">6</span> Value Measurement</div>
+  </div>
+
+  <!-- ══ SUB-PAGE 1: Role Matrix ══ -->
+  <div class="ds-subpage active" id="ds-sp-1">
+    <div class="ds-section-header">
+      <div class="ds-section-label">Overview · Process Flow</div>
+      <div class="ds-section-title">Crew Duty Swap Demo</div>
+      <div class="ds-section-goal">
+        <div class="ds-section-goal-text">
+          <strong>Overall Goal —</strong> Enable crew to conduct duty swaps with full legality support.
+          Automate the awarding process without crew controller intervention.
+          The table below maps each step to its responsible participant.
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-role-table-wrap">
+      <table class="ds-role-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>⚙ Crew Control</th>
+            <th>👤 Crew A</th>
+            <th>👤 Crew B</th>
+            <th>🤖 iROS (System)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td><div class="ds-role-cell"><div class="ds-role-action"><span class="ds-role-action-icon">📋</span>Setup Bid Rules</div></div></td>
+            <td><div class="ds-cell-empty"></div></td>
+            <td><div class="ds-cell-empty"></div></td>
+            <td><div class="ds-cell-empty"></div></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td><div class="ds-role-cell"><div class="ds-role-action"><span class="ds-role-action-icon">🏆</span>Setup Award Rules</div></div></td>
+            <td><div class="ds-cell-empty"></div></td>
+            <td><div class="ds-cell-empty"></div></td>
+            <td><div class="ds-cell-empty"></div></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td><div class="ds-cell-empty"></div></td>
+            <td class="ds-highlight-crewa"><div class="ds-role-cell">
+              <div class="ds-role-action"><span class="ds-role-action-icon">🔍</span>Find crew to swap with</div>
+              <div class="ds-role-sub">Submit swap request</div>
+            </div></td>
+            <td><div class="ds-cell-empty"></div></td>
+            <td class="ds-highlight-system"><div class="ds-role-cell">
+              <div class="ds-role-action"><span class="ds-role-action-icon">⚡</span>Real-time legality check</div>
+              <div class="ds-role-sub">Swap duties automatically</div>
+            </div></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td><div class="ds-cell-empty"></div></td>
+            <td><div class="ds-cell-empty"></div></td>
+            <td class="ds-highlight-crewb"><div class="ds-role-cell">
+              <div class="ds-role-action"><span class="ds-role-action-icon">✅</span>Agree or reject</div>
+            </div></td>
+            <td><div class="ds-cell-empty"></div></td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td><div class="ds-role-cell"><div class="ds-role-action"><span class="ds-role-action-icon">🔔</span>Receive notification</div></div></td>
+            <td><div class="ds-cell-empty"></div></td>
+            <td><div class="ds-cell-empty"></div></td>
+            <td class="ds-highlight-system"><div class="ds-role-cell">
+              <div class="ds-role-action"><span class="ds-role-action-icon">📨</span>Send notification</div>
+            </div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ SUB-PAGE 2: Controller Setup ══ -->
+  <div class="ds-subpage" id="ds-sp-2">
+    <div class="ds-section-header">
+      <div class="ds-section-label">Configuration · Admin Layer</div>
+      <div class="ds-section-title">Controller Setup</div>
+      <div class="ds-section-goal">
+        <div class="ds-section-goal-text">
+          <strong>Goal —</strong> Flexible control on crew eligibility, swap duty type control,
+          open window control and more.
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-goal-cards">
+      <div class="ds-goal-card">
+        <div class="ds-goal-card-num">01</div>
+        <div class="ds-goal-card-icon">👥</div>
+        <div class="ds-goal-card-title">Crew Eligibility</div>
+        <div class="ds-goal-card-desc">Define which crews are eligible to participate in duty swaps based on rank, base, and qualifications.</div>
+      </div>
+      <div class="ds-goal-card">
+        <div class="ds-goal-card-num">02</div>
+        <div class="ds-goal-card-icon">🔄</div>
+        <div class="ds-goal-card-title">Duty Type Control</div>
+        <div class="ds-goal-card-desc">Configure which duty types can be swapped — flight duties, standby, ground duties, and restrictions.</div>
+      </div>
+      <div class="ds-goal-card">
+        <div class="ds-goal-card-num">03</div>
+        <div class="ds-goal-card-icon">📅</div>
+        <div class="ds-goal-card-title">Open Window Control</div>
+        <div class="ds-goal-card-desc">Set submission windows — when crew can open swap requests relative to the duty date and roster publish date.</div>
+      </div>
+      <div class="ds-goal-card">
+        <div class="ds-goal-card-num">04</div>
+        <div class="ds-goal-card-icon">⚖️</div>
+        <div class="ds-goal-card-title">Legality Engine</div>
+        <div class="ds-goal-card-desc">Real-time validation against FTL, rest requirements, and qualification rules at every step of the process.</div>
+      </div>
+    </div>
+
+    <div class="ds-screenshot-showcase">
+      <div class="ds-screenshot-label">Live System · Request Setting UI</div>
+      <div class="ds-screenshot-frame">
+        <div class="ds-screenshot-bar">
+          <div class="ds-screenshot-dots"><span class="ds-screenshot-dot"></span><span class="ds-screenshot-dot"></span><span class="ds-screenshot-dot"></span></div>
+          <div class="ds-screenshot-url">crew-sea-test.roiscloud.com/tp/request/region/pbs/request/management</div>
+        </div>
+        <img src="images/dutyswap/image1.png" class="ds-screenshot-img" alt="Request Setting — Duty Swap bid rules configuration" loading="lazy">
+        <div class="ds-screenshot-caption">Request Setting — crew eligibility, base, swap mode, duty type restrictions, and submission windows</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SUB-PAGE 3: Awarding Setup ══ -->
+  <div class="ds-subpage" id="ds-sp-3">
+    <div class="ds-section-header">
+      <div class="ds-section-label">Configuration · Awarding Logic</div>
+      <div class="ds-section-title">Awarding Setup</div>
+      <div class="ds-section-goal">
+        <div class="ds-section-goal-text">
+          <strong>Goal —</strong> Flexible control on awarding logic — swap rules setup,
+          approval mode configuration, and priority management.
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-goal-cards">
+      <div class="ds-goal-card">
+        <div class="ds-goal-card-num">01</div>
+        <div class="ds-goal-card-icon">🏆</div>
+        <div class="ds-goal-card-title">Swap Rules Engine</div>
+        <div class="ds-goal-card-desc">Define priority rules — seniority-based, first-come-first-served, or custom weighted scoring.</div>
+      </div>
+      <div class="ds-goal-card">
+        <div class="ds-goal-card-num">02</div>
+        <div class="ds-goal-card-icon">🤖</div>
+        <div class="ds-goal-card-title">Approval Mode</div>
+        <div class="ds-goal-card-desc">Choose between fully automatic award, semi-automatic with controller review, or manual approval for specific duty types.</div>
+      </div>
+      <div class="ds-goal-card">
+        <div class="ds-goal-card-num">03</div>
+        <div class="ds-goal-card-icon">📊</div>
+        <div class="ds-goal-card-title">Award Analytics</div>
+        <div class="ds-goal-card-desc">Monitor award rates, rejection reasons, and process efficiency in real time.</div>
+      </div>
+      <div class="ds-goal-card">
+        <div class="ds-goal-card-num">04</div>
+        <div class="ds-goal-card-icon">🔔</div>
+        <div class="ds-goal-card-title">Notification Rules</div>
+        <div class="ds-goal-card-desc">Configure automated push, SMS, or email notifications for each stage of the swap lifecycle.</div>
+      </div>
+    </div>
+
+    <div class="ds-screenshot-showcase">
+      <div class="ds-screenshot-label">Live System · Approval Setting UI</div>
+      <div class="ds-screenshot-frame">
+        <div class="ds-screenshot-bar">
+          <div class="ds-screenshot-dots"><span class="ds-screenshot-dot"></span><span class="ds-screenshot-dot"></span><span class="ds-screenshot-dot"></span></div>
+          <div class="ds-screenshot-url">crew-sea-test.roiscloud.com/tp/request/region/pbs/approve/management</div>
+        </div>
+        <img src="images/dutyswap/image2.png" class="ds-screenshot-img" alt="Approval Setting — awarding rules configuration" loading="lazy">
+        <div class="ds-screenshot-caption">Approval Setting — auto approval mode, effective period, approval open/close windows per phase, and max approval times</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SUB-PAGE 4: Crew Portal Carousel ══ -->
+  <div class="ds-subpage" id="ds-sp-4">
+    <div class="ds-section-header">
+      <div class="ds-section-label">Crew Experience · Mobile-First Portal</div>
+      <div class="ds-section-title">Crew Portal</div>
+    </div>
+
+    <div class="ds-carousel-wrap">
+      <div class="ds-carousel-nav">
+        <div class="ds-carousel-pills" id="ds-carousel-pills">
+          <button class="ds-carousel-pill active" onclick="dsCarouselGo(0)">Login</button>
+          <button class="ds-carousel-pill" onclick="dsCarouselGo(1)">My Roster</button>
+          <button class="ds-carousel-pill" onclick="dsCarouselGo(2)">Publish Duty</button>
+          <button class="ds-carousel-pill" onclick="dsCarouselGo(3)">Search Swaps</button>
+          <button class="ds-carousel-pill" onclick="dsCarouselGo(4)">Select &amp; Confirm</button>
+        </div>
+        <div class="ds-carousel-arrows">
+          <button class="ds-arrow-btn" id="ds-prev" onclick="dsCarouselStep(-1)" disabled>&#8592;</button>
+          <button class="ds-arrow-btn" id="ds-next" onclick="dsCarouselStep(1)">&#8594;</button>
+        </div>
+      </div>
+
+      <div class="ds-child-pages" id="ds-child-pages">
+
+        <!-- Child 0: Login -->
+        <div class="ds-child-page active" id="ds-cp-0">
+          <div class="ds-screenshot-frame">
+            <div class="ds-screenshot-bar">
+              <div class="ds-screenshot-dots"><span class="ds-screenshot-dot"></span><span class="ds-screenshot-dot"></span><span class="ds-screenshot-dot"></span></div>
+              <div class="ds-screenshot-url">crew-sea-test.roiscloud.com/tg/portal/login</div>
+            </div>
+            <img src="images/dutyswap/image3.png" class="ds-screenshot-img" alt="Crew Portal Login — Employee ID authentication" loading="lazy">
+            <div class="ds-screenshot-caption">Login — crew authenticates via Employee ID. PDPA compliant; session data encrypted in transit.</div>
+          </div>
+        </div>
+
+        <!-- Child 1: Roster Landing -->
+        <div class="ds-child-page" id="ds-cp-1">
+          <div class="ds-screenshot-frame">
+            <div class="ds-screenshot-bar">
+              <div class="ds-screenshot-dots"><span class="ds-screenshot-dot"></span><span class="ds-screenshot-dot"></span><span class="ds-screenshot-dot"></span></div>
+              <div class="ds-screenshot-url">ud.com/tg/portal/page/roster</div>
+            </div>
+            <img src="images/dutyswap/image4.png" class="ds-screenshot-img" alt="Crew Portal — My Roster view" loading="lazy">
+            <div class="ds-screenshot-caption">My Roster — crew sees published duties for Mar 2026, with flight details, layovers, and daily duty hours.</div>
+          </div>
+        </div>
+
+        <!-- Child 2: Publish Duty / PDPA -->
+        <div class="ds-child-page" id="ds-cp-2">
+          <div class="ds-pdpa-grid">
+            <div class="ds-screenshot-frame">
+              <div class="ds-screenshot-bar">
+                <div class="ds-screenshot-dots"><span class="ds-screenshot-dot"></span><span class="ds-screenshot-dot"></span><span class="ds-screenshot-dot"></span></div>
+                <div class="ds-screenshot-url">PDPA · Privacy by Design</div>
+              </div>
+              <img src="images/dutyswap/image5.png" class="ds-screenshot-img" alt="PDPA Data Privacy illustration" loading="lazy">
+              <div class="ds-screenshot-caption">Roster is private data under PDPA — crew is always in control of what they publish.</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:20px;padding-top:8px;">
+              <div class="ds-section-label">Privacy · PDPA Compliance</div>
+              <ul class="ds-bullet-list">
+                <li><span class="ds-bullet-icon">🛡</span>Crew roster classified as private data under PDPA — never shared without explicit consent</li>
+                <li><span class="ds-bullet-icon">👤</span>Crew chooses which duties to publish — full ownership retained at all times</li>
+                <li><span class="ds-bullet-icon">🔒</span>Published duties shown anonymously — no name, ID, or rank disclosed to other crew</li>
+                <li><span class="ds-bullet-icon">📋</span>Audit log for every publish/unpublish action maintained for compliance</li>
+                <li><span class="ds-bullet-icon">⏱</span>Crew can withdraw a published duty at any time before a swap is awarded</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Child 3: Search Swap Candidates -->
+        <div class="ds-child-page" id="ds-cp-3">
+          <div class="ds-screenshot-frame">
+            <div class="ds-screenshot-bar">
+              <div class="ds-screenshot-dots"><span class="ds-screenshot-dot"></span><span class="ds-screenshot-dot"></span><span class="ds-screenshot-dot"></span></div>
+              <div class="ds-screenshot-url">crew-sea-test.roiscloud.com/tg/portal/page/pbs/duty-swap</div>
+            </div>
+            <img src="images/dutyswap/image6.png" class="ds-screenshot-img" alt="Search Pairing — Duty Swap candidates" loading="lazy">
+            <div class="ds-screenshot-caption">Search Pairing — filter by date range, CRD, BLH, flight end, layover port, crew ID and more to find eligible candidates.</div>
+          </div>
+        </div>
+
+        <!-- Child 4: Select & Confirm -->
+        <div class="ds-child-page" id="ds-cp-4">
+          <div class="ds-screenshot-pair">
+            <div class="ds-screenshot-frame">
+              <div class="ds-screenshot-bar">
+                <div class="ds-screenshot-dots"><span class="ds-screenshot-dot"></span><span class="ds-screenshot-dot"></span><span class="ds-screenshot-dot"></span></div>
+                <div class="ds-screenshot-url">duty-swap · Select Duty</div>
+              </div>
+              <img src="images/dutyswap/image7.png" class="ds-screenshot-img" alt="Select Duties to Swap" loading="lazy">
+              <div class="ds-screenshot-caption">Step 2 — Select Duty: crew picks duties from both Mine and Others' rosters, pairing info highlighted.</div>
+            </div>
+            <div class="ds-screenshot-frame">
+              <div class="ds-screenshot-bar">
+                <div class="ds-screenshot-dots"><span class="ds-screenshot-dot"></span><span class="ds-screenshot-dot"></span><span class="ds-screenshot-dot"></span></div>
+                <div class="ds-screenshot-url">duty-swap · Submit</div>
+              </div>
+              <img src="images/dutyswap/image8.png" class="ds-screenshot-img" alt="Confirm and Submit Swap" loading="lazy">
+              <div class="ds-screenshot-caption">Step 3 — Submit: side-by-side duty comparison, FDP/BLH/Credit Hours verified, then Submit.</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /ds-child-pages -->
+    </div><!-- /ds-carousel-wrap -->
+  </div>
+
+  <!-- ══ SUB-PAGE 5: Controller View ══ -->
+  <div class="ds-subpage" id="ds-sp-5">
+    <div class="ds-section-header">
+      <div class="ds-section-label">Operations · Live Queue</div>
+      <div class="ds-section-title">Crew Controller View</div>
+      <div class="ds-section-goal">
+        <div class="ds-section-goal-text">Full visibility over the automated swap queue — with override capability when exceptions arise.</div>
+      </div>
+    </div>
+
+    <div class="ds-stat-row">
+      <div class="ds-stat-box">
+        <div class="ds-stat-val">184</div>
+        <div class="ds-stat-lbl">Total Requests</div>
+      </div>
+      <div class="ds-stat-box">
+        <div class="ds-stat-val" style="color:rgba(var(--ds-green),0.9);">143</div>
+        <div class="ds-stat-lbl">Approved</div>
+      </div>
+      <div class="ds-stat-box">
+        <div class="ds-stat-val" style="color:rgba(var(--ds-gold),0.9);">12</div>
+        <div class="ds-stat-lbl">Unsuccessful</div>
+      </div>
+    </div>
+
+    <div class="ds-screenshot-frame" style="margin-bottom:32px;">
+      <div class="ds-screenshot-bar">
+        <div class="ds-screenshot-dots"><span class="ds-screenshot-dot"></span><span class="ds-screenshot-dot"></span><span class="ds-screenshot-dot"></span></div>
+        <div class="ds-screenshot-url">Duty Swap Request · Controller Management View</div>
+      </div>
+      <img src="images/dutyswap/image9.png" class="ds-screenshot-img" alt="Controller Duty Swap Management interface" loading="lazy">
+      <div class="ds-screenshot-caption">Controller View — filter by submit date, Crew A/B ID, swap mode. Review swap pairs, approve or reject individual requests.</div>
+    </div>
+
+    <div class="ds-ctrl-panel" style="max-width:560px;">
+      <div class="ds-ctrl-panel-hdr">Automation Highlights</div>
+      <div class="ds-ctrl-panel-body">
+        <ul class="ds-bullet-list">
+          <li><span class="ds-bullet-icon">🤖</span>Majority of swaps auto-awarded — zero controller action required</li>
+          <li><span class="ds-bullet-icon">⚡</span>Real-time legality check for every step of the process</li>
+          <li><span class="ds-bullet-icon">🛡</span>All crew identities masked in portal — PDPA compliant end-to-end</li>
+          <li><span class="ds-bullet-icon">🔔</span>Both crew notified by push immediately upon award</li>
+          <li><span class="ds-bullet-icon">📋</span>Full audit trail — submit time, crew IDs, status, approver recorded</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SUB-PAGE 6: Value Measurement ══ -->
+  <div class="ds-subpage" id="ds-sp-6">
+    <div class="ds-section-header">
+      <div class="ds-section-label">Impact · Before vs After</div>
+      <div class="ds-section-title">Value Measurement</div>
+      <div class="ds-section-goal">
+        <div class="ds-section-goal-text">
+          Measured improvements across legality, successful rate, automation, crew satisfaction, volume throughput, and controller workload.
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-value-table-wrap">
+      <table class="ds-value-table">
+        <thead>
+          <tr>
+            <th>Dimension</th>
+            <th>Before</th>
+            <th>After</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="ds-val-dim-icon">⚖️</span>Legality</td>
+            <td><span class="ds-before">Minimum check only at Crew A submission and Crew B response</span></td>
+            <td><span class="ds-after">Real-time check for the entire process — every step validated</span></td>
+          </tr>
+          <tr>
+            <td><span class="ds-val-dim-icon">📊</span>Successful Rate</td>
+            <td><span class="ds-val-num before">40–60%</span></td>
+            <td><span class="ds-val-num after">75–90% <span class="ds-arrow-up">↑</span></span></td>
+          </tr>
+          <tr>
+            <td><span class="ds-val-dim-icon">🤖</span>Awarding</td>
+            <td><span class="ds-before">Crew controller manual process</span></td>
+            <td><span class="ds-after">Full auto — zero controller intervention required</span></td>
+          </tr>
+          <tr>
+            <td><span class="ds-val-dim-icon">😊</span>Crew Satisfaction</td>
+            <td><span class="ds-before">Pressure on controllers increasing steadily</span></td>
+            <td><span class="ds-after">Significantly higher — faster response, less friction</span></td>
+          </tr>
+          <tr>
+            <td><span class="ds-val-dim-icon">📦</span>Volume (4.3K Crew)</td>
+            <td>
+              <span class="ds-before">7-day peak after roster publish</span>
+              <span class="ds-val-note">~200 successful cases in first 7 days</span>
+            </td>
+            <td>
+              <span class="ds-after">2–3 day peak</span>
+              <span class="ds-val-note after">1,300 cases Day 1 · 300–100/day next 3–5 days</span>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="ds-val-dim-icon">⏱</span>Controller Time</td>
+            <td><span class="ds-before">40% of working hours on duty swap in first 7 days</span></td>
+            <td><span class="ds-after">Less than 10% of working hours in first 5 days</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /ds-wrap -->

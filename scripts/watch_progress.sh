@@ -2,7 +2,7 @@
 # Runs in background, updates PROGRESS_REPORT.txt every 30 seconds
 # Start: nohup bash ~/rois_tg_live_load/watch_progress.sh &
 
-BASE_DIR="/home/eleihu6/rois_tg_live_load"
+BASE_DIR="$HOME/rois_tg_live_load"
 TABLES_DIR="$BASE_DIR/tables"
 REPORT="$HOME/rois_tg_live_load/PROGRESS_REPORT.txt"
 DB="rois_tg_live_prod"
@@ -19,7 +19,7 @@ while true; do
         IMPORT_RUNNING="YES"
     fi
 
-    DB_STATS=$(mysql -u debian-sys-maint -pR2QY1jwpPm0Vxoyf "$DB" -sNe \
+    DB_STATS=$(mysql -uroot -pR@iscrew2026 "$DB" -sNe \
         "SELECT COUNT(*) AS tables_with_data, FORMAT(SUM(TABLE_ROWS),0) AS est_rows, ROUND(SUM(data_length+index_length)/1024/1024/1024,2) AS data_GB FROM information_schema.tables WHERE table_schema='$DB' AND TABLE_ROWS>0;" 2>/dev/null \
         | tr '\t' '\t')
 

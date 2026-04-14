@@ -8,13 +8,13 @@
 # - Moves file to completed/ on success
 
 TABLE_FILE="$1"
-BASE_DIR="/home/eleihu6/rois_tg_live_load"
+BASE_DIR="$HOME/rois_tg_live_load"
 TABLES_DIR="$BASE_DIR/tables"
 COMPLETED_DIR="$TABLES_DIR/completed"
 LOG_FILE="$BASE_DIR/ROW_AUDIT.log"
 FAILED_LOG="$BASE_DIR/FAILED.log"
 DB="rois_tg_live_prod"
-MYSQL_CMD="mysql -u debian-sys-maint -pR2QY1jwpPm0Vxoyf $DB"
+MYSQL_CMD="mysql -uroot -pR@iscrew2026 $DB"
 
 mkdir -p "$COMPLETED_DIR"
 
@@ -33,7 +33,7 @@ fi
 SQL_ROW_COUNT=$(grep -c '^\s*(' "$TABLE_FILE" 2>/dev/null || echo 0)
 
 # Run the import
-IMPORT_OUTPUT=$(mysql -u debian-sys-maint -pR2QY1jwpPm0Vxoyf "$DB" < "$TABLE_FILE" 2>&1)
+IMPORT_OUTPUT=$(mysql -uroot -pR@iscrew2026 "$DB" < "$TABLE_FILE" 2>&1)
 IMPORT_EXIT=$?
 
 if [ $IMPORT_EXIT -ne 0 ]; then
@@ -43,7 +43,7 @@ if [ $IMPORT_EXIT -ne 0 ]; then
 fi
 
 # Count rows in DB after import
-DB_ROW_COUNT=$(mysql -u debian-sys-maint -pR2QY1jwpPm0Vxoyf "$DB" -sNe "SELECT COUNT(*) FROM \`$TABLE_NAME\`;" 2>/dev/null || echo "?")
+DB_ROW_COUNT=$(mysql -uroot -pR@iscrew2026 "$DB" -sNe "SELECT COUNT(*) FROM \`$TABLE_NAME\`;" 2>/dev/null || echo "?")
 
 # Log result
 echo "[$TIMESTAMP] OK      | $FNAME | table=$TABLE_NAME | sql_rows=$SQL_ROW_COUNT | db_rows=$DB_ROW_COUNT" | tee -a "$LOG_FILE"

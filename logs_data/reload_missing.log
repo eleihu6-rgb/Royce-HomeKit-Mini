@@ -1168,3 +1168,7 @@ Starting single-pass extraction from /home/eleihu6/rois_tg_live_load/rois_tg_liv
 [2026-03-14 06:42:31]   OK fatigue_tmp: sql=0 db=0
 [2026-03-14 06:42:34]   ... 10,000,000 lines read in 346s, 153 tables done
 [2026-03-14 06:42:38]   Loading: file_info (reload)...
+[2026-03-15 16:50:50] ============================================================
+[2026-03-15 16:50:50] reload_missing.py starting
+[2026-03-15 16:50:50] Excluded tables: 80
+[2026-03-15 16:50:50] Querying MySQL for existing tables and zero-row estimates...
