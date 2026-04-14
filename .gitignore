@@ -13,6 +13,9 @@
 # Debug artifacts
 debug/
 
+# Local datasets (not versioned)
+data/
+
 # Python
 __pycache__/
 *.pyc
