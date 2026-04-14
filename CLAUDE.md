@@ -12,7 +12,7 @@ The app version is displayed in `index.html` (React entry) and in `src/component
 **Rule: after every code change in a session, bump the relevant counter before finishing.**  
 Both numbers start at 1 and only go up — never reset.
 
-Current version: **B3/F6**
+Current version: **B3/F7**
 
 Examples:
 - Changed only `server.py` → bump B only (B2/F1 → B3/F1)

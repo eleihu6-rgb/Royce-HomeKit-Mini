@@ -58,7 +58,7 @@ export default function Sidebar({ currentPage, collapsed, onNavigate, onToggle, 
             <div className="logo-icon">✈</div>
             <div className="logo-text">
               <div className="logo-name">ROIs Crew</div>
-              <div className="logo-tagline">Ver: B3/F6</div>
+              <div className="logo-tagline">Ver: B3/F7</div>
             </div>
           </div>
         </div>
