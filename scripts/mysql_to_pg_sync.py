@@ -78,7 +78,17 @@ DEFAULT_MYSQL_TO_PG_LOWER: dict[str, str] = {
 PAIRING_MYSQL_EXTRA_ALIASES: dict[str, str] = {"id": "interface_id"}
 
 # MySQL 无对应列时，写入 PG 固定整数 0（占位，避免结构检查失败）
-PG_FILL_ZERO_IF_MISSING_LOWER: frozenset[str] = frozenset({"duty_count", "seg_count"})
+PG_FILL_ZERO_IF_MISSING_LOWER: frozenset[str] = frozenset(
+    {
+        "duty_count",
+        "seg_count",
+        # PG crew_base 等表常见仅 PG 侧有的外键/接口列，MySQL 源无同名列时占位 0（可按业务改为导入前 SQL 填充）
+        "interface_base_id",
+        "interface_fleet_id",
+        # PG crew_entitlement 等表常见布尔/标记列，MySQL 无同名列时占位 0
+        "freezed",
+    }
+)
 
 # MySQL 值为 NULL 且目标 PG 列名在此集合内时写 0；其它列仍写 NULL（避免违反 CHECK 等）
 PG_NULL_AS_ZERO_LOWER: frozenset[str] = frozenset(
@@ -239,6 +249,46 @@ def pg_identity_always_columns(conn, schema: str, table: str) -> frozenset[str]:
         return frozenset(r[0] for r in cur.fetchall())
 
 
+def pg_numeric_precision_by_column(conn, schema: str, table: str) -> dict[str, tuple[int, int]]:
+    """PG 上 data_type=numeric 的列 -> (precision, scale)，键为小写列名。"""
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT column_name, numeric_precision, numeric_scale
+            FROM information_schema.columns
+            WHERE table_schema = %s AND table_name = %s
+              AND data_type = 'numeric'
+              AND numeric_precision IS NOT NULL
+              AND numeric_scale IS NOT NULL
+            """,
+            (schema, table),
+        )
+        out: dict[str, tuple[int, int]] = {}
+        for name, prec, scale in cur.fetchall():
+            if prec is not None and scale is not None:
+                out[str(name).lower()] = (int(prec), int(scale))
+        return out
+
+
+def _clamp_numeric_to_pg(value: Any, precision: int, scale: int) -> Any:
+    """将值限制在 DECIMAL(precision, scale) 可表示范围内，避免 numeric field overflow。"""
+    if value is None:
+        return None
+    from decimal import Decimal, InvalidOperation
+
+    try:
+        d = Decimal(str(value))
+    except (InvalidOperation, TypeError, ValueError):
+        return value
+    max_val = Decimal(10) ** (precision - scale) - Decimal(10) ** Decimal(-scale)
+    min_val = -max_val
+    if d > max_val:
+        return max_val
+    if d < min_val:
+        return min_val
+    return d
+
+
 def resolve_mysql_keys_per_pg_column(
     mysql_cols: Sequence[str],
     pg_cols: Sequence[str],
@@ -334,7 +384,13 @@ def _value_for_pg_cell(pg_col: str, value):
     return value
 
 
-def row_tuple_by_mysql_keys(row: dict, mysql_keys_per_pg: Sequence[str], pg_cols: Sequence[str]) -> tuple:
+def row_tuple_by_mysql_keys(
+    row: dict,
+    mysql_keys_per_pg: Sequence[str],
+    pg_cols: Sequence[str],
+    *,
+    numeric_bounds: dict[str, tuple[int, int]] | None = None,
+) -> tuple:
     lower_to_key = {k.lower(): k for k in row.keys()}
     out: list = []
     for mk, pc in zip(mysql_keys_per_pg, pg_cols, strict=True):
@@ -350,7 +406,12 @@ def row_tuple_by_mysql_keys(row: dict, mysql_keys_per_pg: Sequence[str], pg_cols
         key = lower_to_key.get(mk.lower())
         if key is None:
             raise KeyError(f"MySQL 行缺少列 {mk!r}")
-        out.append(_value_for_pg_cell(pc, row[key]))
+        v = _value_for_pg_cell(pc, row[key])
+        if numeric_bounds:
+            nb = numeric_bounds.get(pc.lower())
+            if nb is not None:
+                v = _clamp_numeric_to_pg(v, nb[0], nb[1])
+        out.append(v)
     return tuple(out)
 
 
@@ -413,6 +474,20 @@ def remap_pairing_composition_pairing_id(row: dict[str, Any], iface_to_pg: Mappi
     return out
 
 
+def _crew_row_pg_not_null_defaults(row: dict[str, Any]) -> dict[str, Any]:
+    """PG crew.status 为 NOT NULL（smallint）时，对 MySQL 源为 NULL 的行写入占位整数（环境变量 PG_CREW_STATUS_DEFAULT，默认 1）。"""
+    lk = {k.lower(): k for k in row}
+    out = dict(row)
+    sk = lk.get("status")
+    if sk is not None and out.get(sk) is None:
+        raw = os.environ.get("PG_CREW_STATUS_DEFAULT", "1").strip() or "1"
+        try:
+            out[sk] = int(raw)
+        except ValueError:
+            out[sk] = 1
+    return out
+
+
 def count_pg(conn, schema: str, table: str) -> int:
     with conn.cursor() as cur:
         cur.execute(
@@ -447,6 +522,7 @@ def copy_table(
     else:
         insert_sql = sql.SQL("INSERT INTO {} ({}) VALUES %s").format(qualified, cols_sql)
 
+    numeric_bounds = pg_numeric_precision_by_column(pg_conn, schema, table)
     total = 0
     with mysql_conn.cursor() as mcur, pg_conn.cursor() as pcur:
         mcur.execute(f"SELECT * FROM `{table}`")
@@ -455,7 +531,10 @@ def copy_table(
             if not batch:
                 break
             rows = [transform_row(r) if transform_row else r for r in batch]
-            values = [row_tuple_by_mysql_keys(r, mysql_keys_per_pg, pg_cols) for r in rows]
+            values = [
+                row_tuple_by_mysql_keys(r, mysql_keys_per_pg, pg_cols, numeric_bounds=numeric_bounds)
+                for r in rows
+            ]
             execute_values(pcur, insert_sql.as_string(pg_conn), values, page_size=batch_size)
             total += len(values)
     pg_conn.commit()
@@ -514,6 +593,8 @@ def main(argv: list[str] | None = None) -> int:
                         file=sys.stderr,
                     )
                 transform_row = lambda r, m=iface_map: remap_pairing_composition_pairing_id(r, m or {})
+            elif table == "crew":
+                transform_row = _crew_row_pg_not_null_defaults
 
             ok, reason, mysql_keys_per_pg = resolve_mysql_keys_per_pg_column(mcols, pcols, aliases)
             print(f"\n=== 表 {table} ===")

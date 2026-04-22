@@ -6,9 +6,9 @@
   - pairing_composition    -> pairing_composition
   - pairing_duty + pairing_duty_node + pairing_duty_segment -> pairing_segment
 
-pairing_segment 行以 pairing_duty_segment 为主，按 pairing_duty_id 分组后按序确定
-「同一 Duty 内第一个 / 最后一个航段」；pairing_duty_node 中满足命名的列仅在首段
-写入 PICKUP/BRIEF 类时间、在末段写入 DEBRIEF/DROPOFF 类时间（列名与 PG 一致时直接取值）。
+pairing_segment 行以 pairing_duty_segment 为主，按 pairing_duty_id 分组后按序写入 node 时间列（列名与 PG 一致）：
+同一 Duty 多航段时——首段仅保留 pickup/brief（含 double_*），末段仅保留 debrief/dropoff（含 double_*），
+中段四类时间全为 NULL；仅一段的 Duty 不裁剪（四组时间均可在该行）。
 
 用法（与 mysql_to_pg_sync 相同的环境变量 / .env）：
 
@@ -87,7 +87,35 @@ def _fetch_all_dict(cur) -> list[dict[str, Any]]:
     return list(cur.fetchall())
 
 
-_MERGE_NODE_SLOTS = 3
+# pairing_duty_node 按 group_id 出现顺序最多保留 2 组：主列 + double_* 列
+_MERGE_NODE_GROUP_LIMIT = 2
+
+# pickup/brief（含 double_*）：多航段时写在首段；末段与中段置 NULL（单航段 Duty 不裁剪）
+_NODE_FIRST_SEGMENT_KEYS: frozenset[str] = frozenset(
+    {
+        "pickup_start_utc",
+        "pickup_end_utc",
+        "double_pickup_start_utc",
+        "double_pickup_end_utc",
+        "brief_start_utc",
+        "brief_end_utc",
+        "double_brief_start_utc",
+        "double_brief_end_utc",
+    }
+)
+# debrief/dropoff（含 double_*）：多航段时写在末段；首段与中段置 NULL（单航段 Duty 不裁剪）
+_NODE_LAST_SEGMENT_KEYS: frozenset[str] = frozenset(
+    {
+        "debrief_start_utc",
+        "debrief_end_utc",
+        "double_debrief_start_utc",
+        "double_debrief_end_utc",
+        "dropoff_start_utc",
+        "dropoff_end_utc",
+        "double_dropoff_start_utc",
+        "double_dropoff_end_utc",
+    }
+)
 
 # MySQL pairing_duty 列（小写）→ PG pairing_segment 上 duty_* 列（小写）
 _DUTY_MYSQL_TO_PG: tuple[tuple[str, str], ...] = (
@@ -226,19 +254,42 @@ def _segment_row_to_pg_fields(
     return out
 
 
+def _node_slot_to_pickup_cols(slot: int) -> tuple[str, str]:
+    if slot <= 1:
+        return ("pickup_start_utc", "pickup_end_utc")
+    return ("double_pickup_start_utc", "double_pickup_end_utc")
+
+
+def _node_slot_to_brief_cols(slot: int) -> tuple[str, str]:
+    if slot <= 1:
+        return ("brief_start_utc", "brief_end_utc")
+    return ("double_brief_start_utc", "double_brief_end_utc")
+
+
+def _node_slot_to_debrief_cols(slot: int) -> tuple[str, str]:
+    if slot <= 1:
+        return ("debrief_start_utc", "debrief_end_utc")
+    return ("double_debrief_start_utc", "double_debrief_end_utc")
+
+
+def _node_slot_to_dropoff_cols(slot: int) -> tuple[str, str]:
+    if slot <= 1:
+        return ("dropoff_start_utc", "dropoff_end_utc")
+    return ("double_dropoff_start_utc", "double_dropoff_end_utc")
+
+
 def _flatten_duty_nodes_to_pg(
     node_rows: list[dict[str, Any]],
     node_lm: dict[str, str],
     duty: dict[str, Any] | None,
     duty_lm: dict[str, str],
 ) -> dict[str, Any]:
-    """将 pairing_duty_node 多行折叠为 PG pairing_segment 上 pickup_*/brief_*/debrief_*/dropoff_* 列。"""
+    """将 pairing_duty_node 多行折叠为 PG pairing_segment 上 pickup/brief/debrief/dropoff 及 double_* 时间列。"""
     out: dict[str, Any] = {}
     seq_k = node_lm.get("sequence") or node_lm.get("seq")
     id_k = node_lm.get("id")
     gid_k = node_lm.get("group_id")
     node_k = node_lm.get("node")
-    ap_k = node_lm.get("airport")
     st_k = node_lm.get("start_utc")
     en_k = node_lm.get("end_utc")
 
@@ -262,7 +313,7 @@ def _flatten_duty_nodes_to_pg(
             seen_gid.append(gid)
     if not seen_gid:
         seen_gid = [None]
-    gid_to_slot = {g: i + 1 for i, g in enumerate(seen_gid[:_MERGE_NODE_SLOTS])}
+    gid_to_slot = {g: i + 1 for i, g in enumerate(seen_gid[:_MERGE_NODE_GROUP_LIMIT])}
 
     for r in rows:
         gid = r.get(gid_k) if gid_k else None
@@ -271,60 +322,40 @@ def _flatten_duty_nodes_to_pg(
             slot = gid_to_slot.get(seen_gid[0], 1)
         if slot is None:
             slot = 1
-        slot = min(max(int(slot), 1), _MERGE_NODE_SLOTS)
+        slot = min(max(int(slot), 1), _MERGE_NODE_GROUP_LIMIT)
 
         kind = str(r.get(node_k) if node_k else "").strip().upper()
-        ap = r.get(ap_k) if ap_k else None
         st = r.get(st_k) if st_k else None
         en = r.get(en_k) if en_k else None
 
         if kind == "PICKUP":
-            out.setdefault(f"pickup_{slot}_start_utc", st)
-            out.setdefault(f"pickup_{slot}_end_utc", en)
+            c0, c1 = _node_slot_to_pickup_cols(slot)
+            out.setdefault(c0, st)
+            out.setdefault(c1, en)
         elif kind == "BRIEF":
-            out.setdefault(f"brief_{slot}_airport", ap)
-            out.setdefault(f"brief_{slot}_start_utc", st)
-            out.setdefault(f"brief_{slot}_end_utc", en)
+            c0, c1 = _node_slot_to_brief_cols(slot)
+            out.setdefault(c0, st)
+            out.setdefault(c1, en)
         elif kind == "DEBRIEF":
-            out.setdefault(f"debrief_{slot}_airport", ap)
-            out.setdefault(f"debrief_{slot}_start_utc", st)
-            out.setdefault(f"debrief_{slot}_end_utc", en)
+            c0, c1 = _node_slot_to_debrief_cols(slot)
+            out.setdefault(c0, st)
+            out.setdefault(c1, en)
         elif kind == "DROPOFF":
-            out.setdefault(f"dropoff_{slot}_start_utc", st)
-            out.setdefault(f"dropoff_{slot}_end_utc", en)
-
-    time_suffixes: dict[str, tuple[str, ...]] = {
-        "pickup": ("start_utc", "end_utc"),
-        "brief": ("airport", "start_utc", "end_utc"),
-        "debrief": ("airport", "start_utc", "end_utc"),
-        "dropoff": ("start_utc", "end_utc"),
-    }
-    for slot in (2, 3):
-        for kind, suf_list in time_suffixes.items():
-            for suf in suf_list:
-                key = f"{kind}_{slot}_{suf}"
-                k1 = f"{kind}_1_{suf}"
-                if out.get(key) is None and out.get(k1) is not None:
-                    out[key] = out[k1]
+            c0, c1 = _node_slot_to_dropoff_cols(slot)
+            out.setdefault(c0, st)
+            out.setdefault(c1, en)
 
     if duty:
         ast = duty.get(duty_lm["act_str_dt_utc"]) if "act_str_dt_utc" in duty_lm else None
         aen = duty.get(duty_lm["act_end_dt_utc"]) if "act_end_dt_utc" in duty_lm else None
-        sar = duty.get(duty_lm["str_arp"]) if "str_arp" in duty_lm else None
-        ear = duty.get(duty_lm["end_arp"]) if "end_arp" in duty_lm else None
-        fb_air = sar or ear or ""
-        db_air = ear or sar or fb_air
-        for slot in (1, 2, 3):
-            out.setdefault(f"pickup_{slot}_start_utc", ast)
-            out.setdefault(f"pickup_{slot}_end_utc", ast)
-            out.setdefault(f"brief_{slot}_airport", fb_air)
-            out.setdefault(f"brief_{slot}_start_utc", ast)
-            out.setdefault(f"brief_{slot}_end_utc", ast)
-            out.setdefault(f"debrief_{slot}_airport", db_air)
-            out.setdefault(f"debrief_{slot}_start_utc", aen)
-            out.setdefault(f"debrief_{slot}_end_utc", aen)
-            out.setdefault(f"dropoff_{slot}_start_utc", aen)
-            out.setdefault(f"dropoff_{slot}_end_utc", aen)
+        out.setdefault("pickup_start_utc", ast)
+        out.setdefault("pickup_end_utc", ast)
+        out.setdefault("brief_start_utc", ast)
+        out.setdefault("brief_end_utc", ast)
+        out.setdefault("debrief_start_utc", aen)
+        out.setdefault("debrief_end_utc", aen)
+        out.setdefault("dropoff_start_utc", aen)
+        out.setdefault("dropoff_end_utc", aen)
 
     return out
 
@@ -418,6 +449,19 @@ def sync_pairing_segment_merged(
                 seg_use[seg_seq_col] = j
             seg_pg = _segment_row_to_pg_fields(seg_use, seg_lm, iface_map)
             merged: dict[str, Any] = {**duty_pg, **node_pg, **seg_pg}
+            n_seg = len(segs)
+            if n_seg > 1:
+                if j == 1:
+                    for nk in _NODE_LAST_SEGMENT_KEYS:
+                        merged[nk] = None
+                elif j == n_seg:
+                    for nk in _NODE_FIRST_SEGMENT_KEYS:
+                        merged[nk] = None
+                else:
+                    for nk in _NODE_FIRST_SEGMENT_KEYS:
+                        merged[nk] = None
+                    for nk in _NODE_LAST_SEGMENT_KEYS:
+                        merged[nk] = None
             rows_out.append(_tuple_for_pg_row(pcols, merged))
 
     print(
